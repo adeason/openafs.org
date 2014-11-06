@@ -1,0 +1,27 @@
+---
+---
+
+/* CSS rules specifically for the 'downloads' page. */
+
+h3 {
+  background-color: #388ada;
+  color: #fff;
+  font-size: 9pt;
+  padding: 0.5em;
+}
+
+a.osicon {
+  padding-left: 30px;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  display: block;
+  background-repeat: no-repeat;
+  height: 30px;
+}
+
+.osicon.windows { background-image: url("{{ site.baseurl }}/ui/img/os/windows.png"); }
+.osicon.mac { background-image: url("{{ site.baseurl }}/ui/img/os/apple.png"); }
+.osicon.linux { background-image: url("{{ site.baseurl }}/ui/img/os/linux.png"); }
+.osicon.solaris { background-image: url("{{ site.baseurl }}/ui/img/os/solaris.png"); }
+.osicon.freebsd { }
+.osicon.aix { }

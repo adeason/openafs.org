@@ -1,0 +1,5 @@
+# Info about what the latest openafs version is
+
+unix: '1.6.10'
+srpm: '1.6.10-2.src.rpm'
+win: '1.7.31'

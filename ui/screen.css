@@ -1,0 +1,134 @@
+---
+---
+body {
+  margin: 0;
+  font:10pt verdana, arial, helvetica, sans-serif;
+  background: #171e71 url('{{ site.baseurl }}/ui/img/site-bg.png') repeat-x left top;
+}
+a {
+  text-decoration: none;
+  color: #2176c6;
+}
+a:hover {
+  text-decoration: underline;
+}
+/* IE defaults to showing a border around hyperlinked images.
+ * Confirmed as of IE 8. */
+a img {
+  border-width: 0;
+}
+.container {
+  width: 950px;
+  margin: auto;
+}
+#header {
+  background: transparent url('{{ site.baseurl }}/ui/img/header-bg.png') no-repeat center top;
+  height: 93px; /* (bg is 110px, then subtract padding) */
+  margin: auto;
+  padding: 15px 0 0 0;
+  /* overflow:hidden will not work in IE 6, may need to use eg. display:table */
+  overflow: hidden;
+}
+#header h1, #header #main-tagline {
+  color: #fff;
+  margin-right: 1em;
+}
+#header img {
+  margin-left: 1em;
+  float: left;
+}
+#header h1 {
+  font-size: 24pt;
+  font-weight: normal;
+  float: left;
+  margin-left: 0;
+  margin-top: 14px;
+}
+#header #main-tagline {
+  float: right;
+}
+#navigation {
+  clear: both;
+  background: #388ada url('{{ site.baseurl }}/ui/img/navbar-bg.png') no-repeat center top;
+  height: 50px; /* bg is 50px */
+  margin: auto;
+  padding: 0 10px;
+  /* overflow:hidden will not work in IE 6, may need to use eg. display:table */
+  overflow: hidden;
+  font-size: 9pt;
+}
+/* navigation stuff { */
+  #navigation ul {
+    list-style: none outside none;
+    float: left;
+    padding: 0;
+    margin-top: 16px;
+  }
+  #navigation ul li {
+    float: left;
+    padding: 0 0.8em;
+  }
+  #navigation a {
+    color: #fff;
+  }
+  #navigation #searchbox {
+    margin-top: 13px;
+    float: right;
+    background-color: #fff;
+    border: 1px #ccc solid;
+  }
+  #navigation #searchbox input {
+    background-color: #fff;
+    border: 0px #fff solid;
+    height:20px;
+  }
+  #navigation #searchbox #searchbutton {
+    color: #bbb;
+    font-size: 8pt;
+  }
+/* } end navigation */
+
+#content .container {
+  clear: both;
+  overflow: hidden; 
+  background: #D9E4F4;
+}
+/* 'content' stuff { */
+
+  /* "normalpages" are anything but the homepage. */
+  #content .normalpage {
+    width: 810px; /* 950px is a normal .container width */
+    padding: 0em 90px 1em 90px;
+    color: #5f5f5d;
+  }
+  #content h2 {
+    font-weight: normal;
+    font-size: 18pt;
+    color: #2c5fb2;
+  }
+  #content .normalpage h2 {
+    margin-top: 0.2em;
+  }
+/* } end content */
+
+.dshadow {
+  -moz-box-shadow: 3px 3px 4px #999;
+  -webkit-box-shadow: 3px 3px 4px #999;
+  box-shadow: 3px 3px 4px #999;
+  /* For IE 8 */
+  -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#999999')";
+  /* For IE 5.5 - 7 */
+  filter: progid:DXImageTransform.Microsoft.Shadow(Strength=4, Direction=135, Color='#999999');
+}
+
+#footer {
+  /* #16368b */
+  background: transparent url('{{ site.baseurl }}/ui/img/footer-bg.png') no-repeat center top;
+  width: 100%;
+  min-height: 100px;
+  text-align: right;
+  padding-top: 24px; 
+}
+#footer, #footer a {
+  color: #fff;
+}

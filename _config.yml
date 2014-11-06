@@ -1,0 +1,33 @@
+# Disable custom plugins (this is how "Github pages" runs)
+safe: true
+
+files:
+  prefix: "http://dl.openafs.org/dl/openafs"
+
+navigation:
+  - name: Home
+    url: ''
+  - name: About
+    url: about/
+  - name: Downloads
+    url: downloads/
+  - name: Documentation
+    url: docs/
+  - name: Community
+    url: community/
+  - name: Developers
+    url: developers/
+  - name: Support
+    url: support/
+
+defaults:
+  # For all pages, default to the 'page' layout
+  - scope:
+      type: "pages"
+    values:
+      layout: "page"
+ # But for things in /ui (css, js, etc) default to no layout
+  - scope:
+      path: "ui"
+    values:
+      layout: ~

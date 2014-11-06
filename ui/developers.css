@@ -1,0 +1,24 @@
+---
+---
+
+/* CSS rules specific to the 'developers' page. */
+
+.dev-section {
+  padding-left: 120px;
+  min-height: 140px;
+  background-repeat: no-repeat;
+}
+.dev-section.git     { background-image: url("{{ site.baseurl }}/ui/img/git-icon.png"); }
+
+/* This icon is based on an icon in the GNOME High Contrast icon set. It is
+ * released under the LGPL v2.1+. For more information, see
+ * https://commons.wikimedia.org/wiki/File:High-contrast-edit-find-replace.svg.
+ * */
+.dev-section.gerrit  { background-image: url("{{ site.baseurl }}/ui/img/gerrit-icon.png"); }
+
+/* This icon is based on an icon in the GNOME High Contrast icon set. It is
+ * released under the LGPL v2.1+. For more information, see
+ * https://commons.wikimedia.org/wiki/File:High-contrast-bug-buddy.svg. */
+.dev-section.bugs    { background-image: url("{{ site.baseurl }}/ui/img/bugs-icon.png"); }
+.dev-section.discuss { background-image: url("{{ site.baseurl }}/ui/img/discuss-icon.png"); }
+.dev-section.credits { background-image: url("{{ site.baseurl }}/ui/img/credits-icon.png"); }

@@ -1,9 +1,53 @@
-<!DOCTYPE html>
-<html>
-<head>
-<title>Test page</title>
-</head>
-<body>
-<p>Just testing.</p>
-</body>
-</html>
+---
+content-class: "container"
+extra-css: ["splash.css"]
+---
+<div id="splash">
+  <div id="get-it-now">
+    <h2><a id="get-it-now-link" href="{{ site.baseurl }}/downloads/">Get OpenAFS Now<img src="{{ site.baseurl }}/ui/img/download-icon.png"></a></h2>
+    <p><a href="{{ site.baseurl }}/downloads/">All OpenAFS Downloads</a></p>
+  </div>
+
+  <div id="splash-blurb">
+    <h2>A Revolution in Filesystems</h2>
+    <p>AFS is a distributed filesystem pioneered at Carnegie Mellon University.
+    It offers a client-server architecture for federated file sharing and
+    replicated read-only content distribution, providing location independence,
+    scalability, security, and transparent migration capabilities. AFS is
+    available for Unix, Linux, Mac, and Windows.</p>
+    <p><a href="XXXbrokenlink">Lean more...</a></p>
+  </div>
+
+  <div id="learn-more">
+    <div id="whats-afs">
+      <a href="{{ site.baseurl }}/about/"><img id="whats-afs-diagram" src="{{ site.baseurl }}/ui/img/whats-afs.png"><br>
+      <span class="caption">What's AFS?</span></a>
+    </div>
+  </div>
+</div>
+
+<div id="front-ticker">
+  <div id="ticker-news">
+    <h2>Latest News</h2>
+    {% for item in site.data.splash.news %}
+      <div class="ticker-item">
+        <h4>{{ item.date }} - <a href="XXXbrokenlink">{{ item.title }}</a></h4>
+      </div>
+    {% endfor %}
+    <div class="ticker-item">
+      <a href="XXXbrokenlink">More News »</a>
+    </div>
+  </div>
+
+  <div id="ticker-security">
+    <h2>Security Advisories</h2>
+    {% for item in site.data.splash.security %}
+      <div class="ticker-item">
+        <h4>{{ item.date }} - <a href="XXXbrokenlink">{{ item.title }}</a></h4>
+      </div>
+    {% endfor %}
+    <div class="ticker-item">
+      <a href="XXXbrokenlink">More Security Advisories »</a>
+    </div>
+  </div>
+</div>
