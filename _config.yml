@@ -1,5 +1,23 @@
+# First, we have directives that are processed by jekyll itself:
+
 # Disable custom plugins (this is how "Github pages" runs)
 safe: true
+
+defaults:
+  # For all pages, default to the 'page' layout
+  - scope:
+      type: "pages"
+    values:
+      layout: "page"
+
+ # But for things in /ui (css, js, etc) default to no layout
+  - scope:
+      path: "ui"
+    values:
+      layout: ~
+
+# Below here, put data that's not processed by jekyll, but we can access in
+# templates etc via accessing 'site.*'.
 
 files:
   prefix: "http://dl.openafs.org/dl/openafs"
@@ -20,14 +38,3 @@ navigation:
   - name: Support
     url: support/
 
-defaults:
-  # For all pages, default to the 'page' layout
-  - scope:
-      type: "pages"
-    values:
-      layout: "page"
- # But for things in /ui (css, js, etc) default to no layout
-  - scope:
-      path: "ui"
-    values:
-      layout: ~

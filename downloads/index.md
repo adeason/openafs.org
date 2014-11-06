@@ -1,6 +1,6 @@
 ---
 title: Downloads
-extra-css: ["downloads.css"]
+layout: downloads
 ---
 
 ## Downloads ##
@@ -16,7 +16,10 @@ To download the latest stable release of OpenAFS, choose your platform:
 <a class="osicon freebsd" href="freebsd/">FreeBSD</a>
 <a class="osicon aix" href="aix/">AIX</a>
 
-[Older releases]({{ site.baseurl }}/releases/) are also available.
+[Older releases]({{ site.files.prefix }}) are also available.
+
+If your platform is not listed here, you may need to build from source to
+install OpenAFS.
 
 ### Source ###
 
@@ -26,16 +29,22 @@ Source code for the latest stable release is also available:
 * Stable documentation for Windows: \[[.tar.gz][win-doc-gz]\] \[[.tar.bz2][win-doc-bz2]\]
 * Stable source for other platforms: \[[.tar.gz][unix-src-gz]\] \[[.tar.bz2][unix-src-bz2]\]
 * Stable documentation for other platforms: \[[.tar.gz][unix-doc-gz]\] \[[.tar.bz2][unix-doc-bz2]\]
+* [Source RPM][srpm]
 
-For information about retrieving the source via git, see [the Developers
-page]({{ site.baseurl }}/developers).
+For information about retrieving the source via git, building the source, or
+other information, see [the Developers page]({{ site.baseurl }}/developers).
 
-[win-src-gz]:  {{ site.files.prefix }}/{{ site.data.version.win }}/openafs-{{ site.data.version.win }}-src.tar.gz
-[win-src-bz2]: {{ site.files.prefix }}/{{ site.data.version.win }}/openafs-{{ site.data.version.win }}-src.tar.bz2
-[win-doc-gz]:  {{ site.files.prefix }}/{{ site.data.version.win }}/openafs-{{ site.data.version.win }}-doc.tar.gz
-[win-doc-bz2]: {{ site.files.prefix }}/{{ site.data.version.win }}/openafs-{{ site.data.version.win }}-doc.tar.bz2
+{% capture winprefix %}{{ site.files.prefix }}/{{ site.data.version.win }}{% endcapture %}
+{% capture unixprefix %}{{ site.files.prefix }}/{{ site.data.version.unix }}{% endcapture %}
 
-[unix-src-gz]:  {{ site.files.prefix }}/{{ site.data.version.unix }}/openafs-{{ site.data.version.unix }}-src.tar.gz
-[unix-src-bz2]: {{ site.files.prefix }}/{{ site.data.version.unix }}/openafs-{{ site.data.version.unix }}-src.tar.bz2
-[unix-doc-gz]:  {{ site.files.prefix }}/{{ site.data.version.unix }}/openafs-{{ site.data.version.unix }}-doc.tar.gz
-[unix-doc-bz2]: {{ site.files.prefix }}/{{ site.data.version.unix }}/openafs-{{ site.data.version.unix }}-doc.tar.bz2
+[win-src-gz]:  {{ winprefix }}/openafs-{{ site.data.version.win }}-src.tar.gz
+[win-src-bz2]: {{ winprefix }}/openafs-{{ site.data.version.win }}-src.tar.bz2
+[win-doc-gz]:  {{ winprefix }}/openafs-{{ site.data.version.win }}-doc.tar.gz
+[win-doc-bz2]: {{ winprefix }}/openafs-{{ site.data.version.win }}-doc.tar.bz2
+
+[unix-src-gz]:  {{ unixprefix }}/openafs-{{ site.data.version.unix }}-src.tar.gz
+[unix-src-bz2]: {{ unixprefix }}/openafs-{{ site.data.version.unix }}-src.tar.bz2
+[unix-doc-gz]:  {{ unixprefix }}/openafs-{{ site.data.version.unix }}-doc.tar.gz
+[unix-doc-bz2]: {{ unixprefix }}/openafs-{{ site.data.version.unix }}-doc.tar.bz2
+
+[srpm]: {{ unixprefix }}/{{ site.data.version.srpm }}

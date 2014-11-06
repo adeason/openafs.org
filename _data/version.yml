@@ -1,5 +1,20 @@
 # Info about what the latest openafs version is
 
 unix: '1.6.10'
-srpm: '1.6.10-2.src.rpm'
 win: '1.7.31'
+
+srpm: '1.6.10-2.src.rpm'
+
+rpm:
+  fedora: 'openafs-release-fedora-1.6.10-1.noarch.rpm'
+  rhel: 'openafs-release-rhel-1.6.10-1.noarch.rpm'
+
+msi:
+  32bit: 'winxp/openafs-en_US-1-7-3100.msi'
+  32bit-debug: 'winxp/openafs-en_US-DEBUG-1-7-3100.msi'
+
+  64bit: 'winxp/openafs-en_US-64bit-1-7-3100.msi'
+  64bit-debug: 'winxp/openafs-en_US-64bit-DEBUG-1-7-3100.msi'
+
+  tools: 'winxp/openafs-32bit-tools-en_US-1-7-3100.msi'
+  tools-debug: 'winxp/openafs-32bit-tools-en_US-DEBUG-1-7-3100.msi'
