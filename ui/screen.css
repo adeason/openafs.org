@@ -13,9 +13,9 @@ body {
 
 /* Anchor Tags */
 a:link    { text-decoration: none; color: #2176c6; }
-a:visited { color: #1a5c9a; }
+a:visited { text-decoration: none; color: #1a5c9a; }
 a:hover   { text-decoration: underline; }
-a:active  { color: #2683db; }
+a:active  { text-decoration: none; color: #2683db; }
 
 /* IE defaults to showing a border around hyperlinked images.
  * Confirmed as of IE 8. */
