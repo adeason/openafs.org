@@ -38,3 +38,6 @@ navigation:
   - name: Support
     url: support/
 
+collections:
+  newsletter:
+    output: true
