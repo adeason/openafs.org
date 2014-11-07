@@ -15,7 +15,7 @@ extra-css: ["splash.css"]
     replicated read-only content distribution, providing location independence,
     scalability, security, and transparent migration capabilities. AFS is
     available for Unix, Linux, Mac, and Windows.</p>
-    <p><a href="XXXbrokenlink">Lean more...</a></p>
+    <p><a href="/about/">Lean more...</a></p>
   </div>
 
   <div id="learn-more">
@@ -31,7 +31,7 @@ extra-css: ["splash.css"]
     <h2>Latest News</h2>
     {% for item in site.data.splash.news %}
       <div class="ticker-item">
-        <h4>{{ item.date }} - <a href="XXXbrokenlink">{{ item.title }}</a></h4>
+        <h4>{{ item.date }} - <a href="announce/{{ item.page }}">{{ item.title }}</a></h4>
       </div>
     {% endfor %}
     <div class="ticker-item">
@@ -43,7 +43,7 @@ extra-css: ["splash.css"]
     <h2>Security Advisories</h2>
     {% for item in site.data.splash.security %}
       <div class="ticker-item">
-        <h4>{{ item.date }} - <a href="XXXbrokenlink">{{ item.title }}</a></h4>
+        <h4>{{ item.date }} - <a href="security/{{ item.page }}">{{ item.title }}</a></h4>
       </div>
     {% endfor %}
     <div class="ticker-item">

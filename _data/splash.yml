@@ -1,13 +1,17 @@
 news:
   - date: "24-Oct-2014"
+    page: "openafs-1.6.10-release.html"
     title: "OpenAFS 1.6.10 - Maintenance release for UNIX/Linux"
 
   - date: "13-May-2014"
+    page: "XXXbrokenlink"
     title: "OpenAFS 1.7.31 - Native File System client for Microsoft Windows"
 
 security:
   - date: "12-Jun-2014"
+    page: "XXXbrokenlink"
     title: "OpenAFS security advisory 2014-002"
 
   - date: "09-Apr-2014"
+    page: "XXXbrokenlink"
     title: "OpenAFS security advisory 2014-001"
