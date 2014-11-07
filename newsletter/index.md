@@ -1,39 +1,10 @@
 ---
 title: Newsletter
+layout: page
 ---
 
 # OpenAFS Newsletter
 
-  * [OpenAFS Newsletter, Volume 4, Issue 6, October 2013](/newsletter/newsletter-2013-10-volume004-issue06.html)
-  * [OpenAFS Newsletter, Volume 4, Issue 5, March 2013](/newsletter/newsletter-2013-03-volume004-issue05.html)
-  * [OpenAFS Newsletter, Volume 4, Issue 4, October 2012](/newsletter/newsletter-2012-10-volume004-issue04.html)
-  * [OpenAFS Newsletter, Volume 4, Issue 3, August 2012](/newsletter/newsletter-2012-08-volume004-issue03.html)
-  * [OpenAFS Newsletter, Volume 4, Issue 2, May 2012](/newsletter/newsletter-2012-05-volume004-issue02.html)
-  * [OpenAFS Newsletter, Volume 4, Issue 1, April 2012](/newsletter/newsletter-2012-04-volume004-issue01.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 7, July 2011](/newsletter/newsletter-2011-07-volume003-issue07.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 6, June 2011](/newsletter/newsletter-2011-06-volume003-issue06.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 5, May 2011](/newsletter/newsletter-2011-05-volume003-issue05.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 4, April 2011](/newsletter/newsletter-2011-04-volume003-issue04.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 3, March 2011](/newsletter/newsletter-2011-03-volume003-issue03.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 2, February 2011](/newsletter/newsletter-2011-02-volume003-issue02.html)
-  * [OpenAFS Newsletter, Volume 3, Issue 1, January 2011](/newsletter/newsletter-2011-01-volume003-issue01.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 12, December 2010](/newsletter/newsletter-2010-12-volume002-issue12.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 11, November 2010](/newsletter/newsletter-2010-11-volume002-issue11.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 10, October 2010](/newsletter/newsletter-2010-10-volume002-issue10.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 9, September 2010](/newsletter/newsletter-2010-09-volume002-issue09.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 8, August 2010](/newsletter/newsletter-2010-08-volume002-issue08.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 7, July 2010](/newsletter/newsletter-2010-07-volume002-issue07.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 6, June 2010](/newsletter/newsletter-2010-06-volume002-issue06.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 5, May 2010](/newsletter/newsletter-2010-05-volume002-issue05.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 4, April 2010](/newsletter/newsletter-2010-04-volume002-issue04.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 3, March 2010](/newsletter/newsletter-2010-03-volume002-issue03.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 2, February 2010](/newsletter/newsletter-2010-02-volume002-issue02.html)
-  * [OpenAFS Newsletter, Volume 2, Issue 1, January 2010](/newsletter/newsletter-2010-01-volume002-issue01.html)
-  * [OpenAFS Newsletter, Issue 8, December 2009](/newsletter/newsletter-2009-12-volume001-issue08.html)
-  * [OpenAFS Newsletter, Issue 7, November 2009](/newsletter/newsletter-2009-11-volume001-issue07.html)
-  * [OpenAFS Newsletter, Issue 6, October 2009](/newsletter/newsletter-2009-10-volume001-issue06.html)
-  * [OpenAFS Newsletter, Issue 5, September 2009](/newsletter/newsletter-2009-09-volume001-issue05.html)
-  * [OpenAFS Newsletter, Issue 4, August 2009](/newsletter/newsletter-2009-08-volume001-issue04.html)
-  * [OpenAFS Newsletter, Issue 3, July 2009](/newsletter/newsletter-2009-07-volume001-issue03.html)
-  * [OpenAFS Newsletter, Issue 2, June 2009](/newsletter/newsletter-2009-06-volume001-issue02.html)
-  * [OpenAFS Newsletter, Issue 1, May 2009](/newsletter/newsletter-2009-05-volume001-issue01.html)
+{% for post in site.categories['newsletter'] %} * [{{ post.title }}]({{ post.permalink }})
+{% endfor %}
+
