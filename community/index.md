@@ -34,7 +34,7 @@ Same deal as the AFS & Kerberos Best Practices Workshop, but across the pond.
 
 ### Newsletter ###
 
-Read a summary of [what's happening in the OpenAFS community](XXXbrokenlink).
+Read a summary of [what's happening in the OpenAFS community](/newsletter/).
 
 ### Success Stories ###
 
