@@ -1,6 +1,8 @@
 ---
 ---
 
+/* Downloads
+*************************************************************************************/
 /* CSS rules specifically for the 'downloads' page. */
 
 h3 {
@@ -8,20 +10,42 @@ h3 {
   color: #fff;
   font-size: 9pt;
   padding: 0.5em;
+  text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
+/* OS Icon Anchors */
 a.osicon {
-  padding-left: 30px;
-  padding-top: 3px;
-  padding-bottom: 5px;
+  padding: 5px 0 5px 30px;
   display: block;
   background-repeat: no-repeat;
-  height: 30px;
+  line-height: 1em;
 }
 
 .osicon.windows { background-image: url("{{ site.baseurl }}/ui/img/os/windows.png"); }
-.osicon.mac { background-image: url("{{ site.baseurl }}/ui/img/os/apple.png"); }
-.osicon.linux { background-image: url("{{ site.baseurl }}/ui/img/os/linux.png"); }
+.osicon.mac     { background-image: url("{{ site.baseurl }}/ui/img/os/apple.png"); }
+.osicon.linux   { background-image: url("{{ site.baseurl }}/ui/img/os/linux.png"); }
 .osicon.solaris { background-image: url("{{ site.baseurl }}/ui/img/os/solaris.png"); }
 .osicon.freebsd { }
-.osicon.aix { }
+.osicon.aix     { }
+
+
+/* Download List Items */
+.download-list-items {
+  width: 360px;
+  padding: 0;
+  list-style: none;
+  background: #c5d6ee;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+/* Download List Items: Item */
+.download-list-items .item {
+  width: 153px;
+  padding: 13px;
+  border-bottom: 1px solid #d9e4f4;
+  border-right: 1px solid #d9e4f4;
+  display: block;
+  float: left;
+}

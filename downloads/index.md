@@ -9,12 +9,14 @@ layout: downloads
 
 To download the latest stable release of OpenAFS, choose your platform:
 
-<a class="osicon windows" href="windows/">Windows</a>
-<a class="osicon mac" href="mac/">Mac OS X</a>
-<a class="osicon linux" href="linux/">Linux</a>
-<a class="osicon solaris" href="solaris/">Solaris</a>
-<a class="osicon freebsd" href="freebsd/">FreeBSD</a>
-<a class="osicon aix" href="aix/">AIX</a>
+<ul class="download-list-items">
+  <li class="item"><a class="osicon windows" href="windows/">Windows</a></li>
+  <li class="item"><a class="osicon mac" href="mac/">Mac OS X</a></li>
+  <li class="item"><a class="osicon linux" href="linux/">Linux</a></li>
+  <li class="item"><a class="osicon solaris" href="solaris/">Solaris</a></li>
+  <Li class="item"><a class="osicon freebsd" href="freebsd/">FreeBSD</a></Li>
+  <li class="item"><a class="osicon aix" href="aix/">AIX</a></li>
+</ul>
 
 [Older releases]({{ site.files.prefix }}) are also available.
 

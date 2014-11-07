@@ -64,7 +64,7 @@
     }
     #splash-blurb p {
       padding-right: 220px;
-      font-size: 8pt;
+      font-size: 10pt;
     }
     #splash-blurb p a {
       color: #fcb211;
@@ -111,8 +111,7 @@
   }
   /* An individual column's header, eg. Security Advisories */
   #front-ticker > div h2 {
-    text-transform: uppercase;
-    font-weight: normal;
+    font-weight: bold;
     font-size: 13pt;
     color: #303f82;
     text-align: center;
