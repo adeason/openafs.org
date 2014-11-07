@@ -29,7 +29,7 @@ extra-css: ["splash.css"]
 <div id="front-ticker">
   <div id="ticker-news">
     <h2>Latest News</h2>
-    {% for post in site.posts %}
+    {% for post in site.posts limit:3 %}
       <div class="ticker-item">
          <h4>{{  post.date | date_to_string }} - <a href="{{ post.url }}">{{ post.title }}</a></h4>
       </div>
