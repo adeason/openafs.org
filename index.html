@@ -29,14 +29,16 @@ extra-css: ["splash.css"]
 <div id="front-ticker">
   <div id="ticker-news">
     <h2>Latest News</h2>
-    {% for item in site.data.splash.news %}
+    {% for post in site.posts %}
       <div class="ticker-item">
-        <h4>{{ item.date }} - <a href="announce/{{ item.page }}">{{ item.title }}</a></h4>
+         <h4>{{  post.date | date_to_string }} - <a href="{{ post.url }}">{{ post.title }}</a></h4>
       </div>
     {% endfor %}
     <div class="ticker-item">
       <a href="XXXbrokenlink">More News »</a>
     </div>
+
+
   </div>
 
   <div id="ticker-security">
