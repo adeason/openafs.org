@@ -1,0 +1,109 @@
+diff --git a/src/libacl/aclprocs.c b/src/libacl/aclprocs.c
+index 106dfe3..72bf8ae 100644
+--- a/src/libacl/aclprocs.c
++++ b/src/libacl/aclprocs.c
+@@ -23,13 +23,13 @@
+ #else
+ #include <netinet/in.h>
+ #endif
++#include <limits.h>
+ #include <string.h>
+ #include <rx/xdr.h>
+ #include <rx/rx.h>
+ #include <afs/ptclient.h>
+ #include <afs/ptuser.h>
+ #include "acl.h"
+-
+ #ifdef AFS_PTHREAD_ENV
+ #include <assert.h>
+ #include <pthread.h>
+@@ -251,7 +251,7 @@ acl_Internalize_pr(int (*func)(namelist *names, idlist *ids), char *elist, struc
+ 
+     if (sscanf(elist, "%d\n%d\n", &p, &n) != 2)
+ 	return -1;
+-    if (p + n > ACL_MAXENTRIES)
++    if (p < 0 || n < 0 || p > INT_MAX - n || p + n > ACL_MAXENTRIES)
+ 	return (-1);
+     acl_NewACL(p + n, acl);
+     (*acl)->total = p + n;
+@@ -276,7 +276,7 @@ acl_Internalize_pr(int (*func)(namelist *names, idlist *ids), char *elist, struc
+     nextc++;			/* now at the beginning of the entry list */
+     for (i = 0; i < (*acl)->positive; i++) {
+ 	int k;
+-	if (sscanf(nextc, "%s\t%d\n", lnames.namelist_val[i], &k) != 2) {
++	if (sscanf(nextc, "%63s\t%d\n", lnames.namelist_val[i], &k) != 2) {
+ 	    free(lnames.namelist_val);
+ 	    return (-1);
+ 	}
+@@ -288,7 +288,7 @@ acl_Internalize_pr(int (*func)(namelist *names, idlist *ids), char *elist, struc
+     for (i = (*acl)->total - 1; i >= (*acl)->total - (*acl)->negative;
+ 	 i--, j++) {
+ 	if (sscanf
+-	    (nextc, "%s\t%d\n", lnames.namelist_val[j],
++	    (nextc, "%63s\t%d\n", lnames.namelist_val[j],
+ 	     &((*acl)->entries[j].rights)) != 2) {
+ 	    free(lnames.namelist_val);
+ 	    return (-1);
+diff --git a/src/libadmin/client/afs_clientAdmin.c b/src/libadmin/client/afs_clientAdmin.c
+index 3f50786..35dbd6c 100644
+--- a/src/libadmin/client/afs_clientAdmin.c
++++ b/src/libadmin/client/afs_clientAdmin.c
+@@ -1542,7 +1542,7 @@ afsclient_ACLEntryAdd(const char *directory, const char *user,
+      */
+ 
+     is_dfs =
+-	sscanf(old_acl_string, "%d dfs:%d %s", &cur_acl.nplus, &cur_acl.dfs,
++	sscanf(old_acl_string, "%d dfs:%d %1024s", &cur_acl.nplus, &cur_acl.dfs,
+ 	       cur_acl.cell);
+     ptr = strchr(old_acl_string, '\n');
+     ptr++;
+@@ -1567,7 +1567,7 @@ afsclient_ACLEntryAdd(const char *directory, const char *user,
+      */
+ 
+     for (i = 0; i < (cur_acl.nplus + cur_acl.nminus); i++) {
+-	sscanf(ptr, "%s%d\n", cur_user, &cur_user_acl);
++	sscanf(ptr, "%63s%d\n", cur_user, &cur_user_acl);
+ 	/*
+ 	 * Skip the entry for the user we are replacing/adding
+ 	 */
+iff --git a/src/venus/fs.c b/src/venus/fs.c
+index 5ffa27b..02f7cd5 100644
+--- a/src/venus/fs.c
++++ b/src/venus/fs.c
+@@ -561,7 +561,7 @@ EmptyAcl(char *astr)
+     tp->nplus = tp->nminus = 0;
+     tp->pluslist = tp->minuslist = 0;
+     tp->dfs = 0;
+-    sscanf(astr, "%d dfs:%d %s", &junk, &tp->dfs, tp->cell);
++    sscanf(astr, "%d dfs:%d %1024s", &junk, &tp->dfs, tp->cell);
+     return tp;
+ }
+ 
+@@ -576,7 +576,7 @@ ParseAcl(char *astr)
+     ta = (struct Acl *)malloc(sizeof(struct Acl));
+     assert(ta);
+     ta->dfs = 0;
+-    sscanf(astr, "%d dfs:%d %s", &ta->nplus, &ta->dfs, ta->cell);
++    sscanf(astr, "%d dfs:%d %1024s", &ta->nplus, &ta->dfs, ta->cell);
+     astr = SkipLine(astr);
+     sscanf(astr, "%d", &ta->nminus);
+     astr = SkipLine(astr);
+@@ -587,7 +587,7 @@ ParseAcl(char *astr)
+     last = 0;
+     first = 0;
+     for (i = 0; i < nplus; i++) {
+-	sscanf(astr, "%100s %d", tname, &trights);
++	sscanf(astr, "%99s %d", tname, &trights);
+ 	astr = SkipLine(astr);
+ 	tl = (struct AclEntry *)malloc(sizeof(struct AclEntry));
+ 	assert(tl);
+@@ -605,7 +605,7 @@ ParseAcl(char *astr)
+     last = 0;
+     first = 0;
+     for (i = 0; i < nminus; i++) {
+-	sscanf(astr, "%100s %d", tname, &trights);
++	sscanf(astr, "%99s %d", tname, &trights);
+ 	astr = SkipLine(astr);
+ 	tl = (struct AclEntry *)malloc(sizeof(struct AclEntry));
+ 	assert(tl);
+

@@ -1,0 +1,196 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+
+		  OpenAFS Security Advisory 2002-001
+
+Topic: Remote root vulnerability in OpenAFS servers
+
+Issued:      03-Aug-2002
+Last Update: 03-Aug-2002
+Severity:    High
+Affected:    OpenAFS 1.0 - 1.2.5, OpenAFS 1.3.0 - 1.3.2
+
+A remote user may be able to gain root access to an OpenAFS database
+server or fileserver host.  In addition, certain administrative clients
+may be attacked if they make requests to a rogue server.
+
+SUMMARY
+=======
+
+There is an integer overflow bug in the SUNRPC-derived RPC library
+used by OpenAFS that could be exploited to crash certain OpenAFS
+servers (volserver, vlserver, ptserver, buserver) or to obtain
+unauthorized root access to a host running one of these processes.
+
+In addition, it is possible for a rogue server to attack certain
+administrative clients (vos, pts, backup, butc, rxstat), but only
+if certain RPC requests are made to the rogue server.
+
+The OpenAFS fileserver and cache manager (client) are not vulnerable
+to these attacks.  No exploits are presently known to be available
+for this vulnerability.
+
+IMPACT
+======
+
+A remote attacker can potentially execute arbitrary code on an OpenAFS
+server host with the privileges of the user running the OpenAFS server
+processes (usually root).  This can lead to compromise of the OpenAFS
+administrative databases, data stored on a compromised server, or
+possible root access on a server host.  Once a server host has been
+compromised, the attacker is able to obtain access to any other OpenAFS
+servers in the same cell.
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS 1.0.x and 1.1.x.
+All releases of OpenAFS 1.2.x, up to and including OpenAFS 1.2.5.
+All releases of OpenAFS 1.3.x, up to and including OpenAFS 1.3.2.
+
+FIXES
+=====
+
+The OpenAFS project recommends that all users upgrade to OpenAFS
+1.2.6 or newer.  The latest stable OpenAFS release is always available
+from http://www.openafs.org/release/latest.html.
+
+No update is presently available for the OpenAFS-unstable series.
+
+For those who are unable to upgrade, apply the following patch to
+correct the XDR vulnerability, and rebuild your tree.
+
+===================================================================
+RCS file: /cvs/openafs/src/rx/Makefile.in,v
+retrieving revision 1.4.2.1
+retrieving revision 1.4.2.2
+diff -u -r1.4.2.1 -r1.4.2.2
+- --- openafs/src/rx/Makefile.in	2002/01/20 08:38:38	1.4.2.1
++++ openafs/src/rx/Makefile.in	2002/08/02 02:45:14	1.4.2.2
+@@ -38,7 +38,7 @@
+ # Generic xdr objects (or, at least, xdr stuff that's not newly defined for rx).
+ # Really the xdr stuff should be in its own directory.
+ #
+- -XDROBJS = xdr_arrayn.o xdr_rx.o xdr_afsuuid.o
++XDROBJS = xdr.o xdr_array.o xdr_arrayn.o xdr_rx.o xdr_afsuuid.o
+ 
+ RXOBJS = rx_clock.o rx_event.o rx_user.o rx_lwp.o rx.o rx_null.o rx_globals.o \
+ 	rx_getaddr.o rx_misc.o rx_packet.o rx_rdwr.o  rx_trace.o rx_conncache.o \
+===================================================================
+RCS file: /cvs/openafs/src/rx/xdr.c,v
+retrieving revision 1.4
+retrieving revision 1.5
+diff -u -r1.4 -r1.5
+- --- openafs/src/rx/xdr.c	2002/06/08 04:43:38	1.4
++++ openafs/src/rx/xdr.c	2002/07/31 23:13:09	1.5
+@@ -558,6 +558,8 @@
+ 	u_int size;
+ 	u_int nodesize;
+ 
++        if (maxsize > ((~0) >> 1) - 1) maxsize = ((~0) >> 1) - 1;
++
+ 	/*
+ 	 * first deal with the length since xdr strings are counted-strings
+ 	 */
+===================================================================
+RCS file: /cvs/openafs/src/rx/xdr_array.c,v
+retrieving revision 1.4
+retrieving revision 1.5
+diff -u -r1.4 -r1.5
+- --- openafs/src/rx/xdr_array.c	2001/08/08 00:03:57	1.4
++++ openafs/src/rx/xdr_array.c	2002/07/31 23:13:09	1.5
+@@ -84,7 +84,10 @@
+ 	register caddr_t target = *addrp;
+ 	register u_int c;  /* the actual element count */
+ 	register bool_t stat = TRUE;
+- -	register int nodesize;
++	register u_int nodesize;
++
++        i = ((~0) >> 1) / elsize;
++        if (maxsize > i) maxsize = i;
+ 
+ 	/* like strings, arrays are really counted arrays */
+ 	if (! xdr_u_int(xdrs, sizep)) {
+===================================================================
+RCS file: /cvs/openafs/src/rx/xdr_arrayn.c,v
+retrieving revision 1.4
+retrieving revision 1.5
+diff -u -r1.4 -r1.5
+- --- openafs/src/rx/xdr_arrayn.c	2001/08/08 00:03:57	1.4
++++ openafs/src/rx/xdr_arrayn.c	2002/07/31 23:13:09	1.5
+@@ -89,7 +89,10 @@
+ 	register caddr_t target = *addrp;
+ 	register u_int c;  /* the actual element count */
+ 	register bool_t stat = TRUE;
+- -	register int nodesize;
++	register u_int nodesize;
++
++        i = ((~0) >> 1) / elsize;
++        if (maxsize > i) maxsize = i;
+ 
+ 	/* like strings, arrays are really counted arrays */
+ 	if (! xdr_u_int(xdrs, sizep)) {
+===================================================================
+
+This patch may also be found at:
+
+    http://www.openafs.org/security/xdr-updates-20020731.delta
+
+The associated detached PGP signature is at
+
+    http://www.openafs.org/security/xdr-updates-20020731.delta.asc
+
+It was generated against OpenAFS 1.2.5, but should apply to earlier
+releases, possibly with some offset.
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+    http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+    http://www.openafs.org/
+
+ACKNOWLEDGMENTS
+===============
+
+Thanks to ISS for discovery of the vulnerability.
+
+Thanks to Nickolai Zeldovich for assistance in discovering the
+particulars of this bug and developing a fix.
+
+Thanks also to Tom Yu and the MIT Kerberos Development Team for their
+advisory MITKRB5-SA-2002-001, the form and much of the text of which
+was shamelessly stolen to produce this alert.
+
+DETAIL
+======
+
+The xdr_array() decoder computes the value of the NODESIZE variable in
+a way that can lead to integer overflow.  An attacker can construct an
+XDR encoding that will take advantage of this integer overflow in
+order to overflow the allocated heap buffer, depending on the
+specifics of the caller of the xdr_array() function.
+
+Several uses of xdr_array() in various AFS protocols are unsafe in an
+environment where this bug exists.  In particular, any use of a
+counted array with unbounded size (represented in the Rx protocol
+description with an empty pair of angle brackets '<>') is unsafe.  Such
+uses appear in input arguments to procedures in the PTS, VLDB, volserver,
+and backup database protocols, and output arguments from procedures in all
+of these protocols and in the Rx statistics interface implemented by most
+OpenAFS servers.
+
+A remote user may be able to use the buffer overflow to execute arbitrary
+code on the server under attack, possibly leading to unauthorized root
+access.  Similarly a rogue server may be able to use the buffer overflow
+to attack a client which makes one of the RPC's with unsafe output
+arguments.
+
+-----BEGIN PGP SIGNATURE-----
+Version: PGP 6.5.8
+
+iQBVAwUBPUxo8bD+655x7JNnAQGOYAH/ZzSzw5FyLI8YTmgJH4qSO7rKQVpy8F+L
+aIU3Xy4HngBpYALsOrJLkCI7h966Li00YhyXgsm4UW9NzbCORc80Kw==
+=iILR
+-----END PGP SIGNATURE-----

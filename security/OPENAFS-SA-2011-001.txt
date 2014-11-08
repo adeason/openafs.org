@@ -1,0 +1,73 @@
+Topic: Denial of service attack against Rx server processes
+       CVE-2011-0430
+
+Issued:		23-Feb-2011
+Last Update:    23-Feb-2011
+Affected:	OpenAFS servers
+		running versions 1.2.8 thru 1.4.12.1 & 1.5.0 thru 1.5.74
+
+An attacker with the ability to connect to an Rx server can trigger a double
+free, crashing the server. Clients are not affected.
+
+SUMMARY
+=======
+
+AFS uses Heimdal Kerberos 5 libraries to support authentication tokens
+including a limited subset of a Kerberos 5 ticket. Due to a bug in Heimdal
+which could cause a double-free to occur in some circumstances, it is possible
+to crash an Rx server which verifies tokens meeting certain criteria thus
+triggering this bug, leading to a denial of service. Kerberos 5 is not
+required to be configured for this defect to be exploitable.
+
+As AFS clients do not provide an encrypted callback channel, no client
+software is affected; Issues are present only in AFS servers.
+
+IMPACT
+======
+
+By sending authenticated Rx traffic using a constructed bad ticket,
+it is possible to crash an Rx server running the affected code.
+
+No publicly available exploits are currently known.
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS 1.2.8 to (and including) 1.4.12.1
+All releases of OpenAFS 1.5.0 to 1.5.74
+
+Contrary to the erroneous CVE, 1.4.14 is NOT affected.
+
+FIXES
+=====
+
+The OpenAFS project recommends that administrators upgrade to OpenAFS version
+1.4.14 or newer, or as appropriate for people testing features in the OpenAFS
+1.5 series, OpenAFS version 1.5.75 or newer. 
+
+For those sites unable, or unwilling, to upgrade a patch which resolves this
+issue is available directly from 
+    http://www.openafs.org/security/rxkad-asn1-null-free.patch
+
+Note that this patch is against 1.4.12, although it may apply to earlier 
+releases. Patches for 1.5 and HEAD are available in git, as commit
+582878a75858a341f674f833609f08b6d3bf839a for the OpenAFS 1.5 series.
+
+The latest stable OpenAFS release is always available from 
+http://www.openafs.org/release/latest.html
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+    http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+    http://www.openafs.org/
+
+
+ACKNOWLEDGEMENTS
+================
+
+This issue was identified by Andrew Deason. The final version of the
+patch that is being distributed in OpenAFS releases is from Heimdal.

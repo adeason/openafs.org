@@ -1,0 +1,265 @@
+How to deploy the rxkad-k5 and rxkad-kdf extensions on OpenAFS 1.4.15
+
+This document assumes a multi-server AFS cell which is currently running
+a 1.4.x-series release on those servers.  The goal is to describe a
+procedure for enabling the rxkad-k5 and rxkad-kdf extensions for the
+servers in the cell with the minimal amount of user-visible disruption.
+
+In this document, the term "new code" means OpenAFS 1.4.15; the "old code"
+and "existing code" refer to the earlier version(s) of OpenAFS from the
+1.4.x series which were running in the cell prior to the upgrade process.
+
+The new codebase is designed to use the existing server codepath unless
+the new code path is explicitly enabled by the generation of an
+rxkad.keytab file.  As such, it is safe to deploy the updated software
+without any configuration changes; this will be a key component of the
+minimal-disruption upgrade.
+
+This document is written with the assumption that only a single Kerberos
+realm is used to provide authentication to the AFS cell.  If multiple
+Kerberos realms are in use (i.e., afs/cell@REALM and afs/cell@DOMAIN),
+then the Kerberos keys in both realms will need to be updated in step (4).
+The Kerberos keytab format allows the rxkad.keytab to hold keys for both
+afs/cell@REALM and afs/cell@DOMAIN regardless of their respective kvnos.
+All keys in the rxkad.keytab will be tried for decrypting incoming requests,
+so such multi-realm setups should continue to function as previously.
+
+1.  Ensure that you have binaries available for all servers in the cell.
+    This could be from the OS package manager, local builds, binaries
+    downloaded from openafs.org, etc..  It is necessary to upgrade the
+    installed software on all servers before enabling the rxkad-k5 and
+    rxkad-kdf extensions.
+
+2.  Install the new software on all servers in the cell.  It is not necessary
+    to install the new software on all machines simultaneously (within the
+    constraints of the urgency of the update); a few machines can take
+    the update early to "bake in" and ensure that no problems develop.
+    Be sure to restart the server processes ("bos restart [servername]
+    -bosserver") so that the new software is running, including the bosserver.
+    This server restart may cause a user-visible 'blip' to clients accessing
+    that server.  If time permits, evacuating all data volumes off the server
+    being restarted will reduce the chance of disruption being visible
+    to clients.
+
+3.  Ensure that it is possible to generate a new long-term Kerberos key
+    for the AFS service principal.  This could be by having a
+    domain/realm administrator with sufficient privilege to extract a
+    new keytab for the service principal, or by having the existing key
+    in a krb5 keytab, or by knowing the password of the service principal
+    (if its key is password-based instead of random).  If the AFS service's
+    long-term key is only available in the AFS KeyFile and no realm
+    administrator is available, it will be necessary to extract the key
+    from the KeyFile and generate a keytab from it.  The companion document
+    how-to-rekey.txt has detailed instructions for how a new long-term key can
+    be generated (tailored for MIT, Heimdal, and AD KDC deployments) as well
+    as instructions for how an AFS KeyFile may be converted into a krb5
+    keytab (if necessary).
+
+4.  Using the mechanism from (3), rekey the cell, with the new krb5 key
+    being of a strong enctype (AES is recommended, but other enctypes
+    may be used if not all the AFS servers support AES).  A general treatment
+    of how to rekey a cell is presented in a companion document,
+    how-to-rekey.txt.  There are many considerations to the rekeying procedure;
+    it is advisable to read that procedure multiple times and fully
+    understand it before beginning.  After rekeying, the new krb5 key should
+    be retained in krb5 keytab form (the asetkey utility is *not* used),
+    and stored in a file named 'rxkad.keytab' in the server configuration
+    directory (the one with the KeyFile).
+    On a Debian system, this would be something like:
+	mv /tmp/rxkad.keytab /etc/openafs/server/rxkad.keytab
+    On FreeBSD:
+	mv /tmp/rxkad.keytab /usr/local/etc/openafs/server/rxkad.keytab
+    With the traditional Transarc paths:
+	mv /tmp/rxkad.keytab /usr/afs/etc/rxkad.keytab
+    Be sure to retain the existing KeyFile -- the KeyFile and rxkad.keytab
+    must both be present in the server configuration directory at this point!
+    Once the key is changed in the Kerberos database, any new service
+    tickets issued to clients (e.g., by running aklog) will be encrypted
+    with the new key; AFS servers will be able to decrypt the tokens generated
+    from those service tickets as soon as the rxkad.keytab file is in place.
+    As described in the rekeying procedure, make the time gap between
+    generating a new key in the Kerberos database and the installation of
+    the rxkad.keytab on the AFS servers as small as possible.  Since the
+    KeyFile remains in place, existing AFS tokens continue to work.
+
+5.  The creation of an rxkad.keytab file only changes the behavior of
+    running server processes by allowing them to decrypt incoming tokens.
+    Existing server-to-server connections will continue to use the
+    preexisting printed tokens, which are essentially krb4 tickets (and
+    as such are using a DES key from the KeyFile).  Server-to-server
+    communications will be refreshed to use the new key when server processes
+    restart, so the next step is to use 'bos restart -all' to refresh
+    the server-to-server communications.  Again, there may be a user-visible
+    'blip' to clients accessing a server when its processes are restarted.
+    'bos restart -bosserver' should not be needed at this step.
+
+    The server-to-server communication logic is also used with the
+    '-localauth' switch for the client utilities.  The rxkad-k5 extension
+    allows these "localauth" connections to use the newly-created
+    rxkad.keytab for authentication; any machines (in addition to the actual
+    AFS servers) which use a KeyFile for this "localauth" functionality
+    will need to have the rxkad.keytab copied to them and have the
+    upgraded software.
+
+6.  For a minimal-impact transition, the old keys in the KeyFile should
+    be retained until all existing tokens have expired.  Printed tokens
+    used for server-to-server communications never expire, so the server
+    restarts of step (5) are necessary.  The maximum lifetime for tokens
+    issued by the KDC will be determined by the KDC configuration.
+    An indication of this maximum lifetime can be obtained by requesting
+    absurdly long-lived tickets ('kinit -l1000d -r1000d') and examining
+    the output of 'klist' to see what lifetime was actually issued.
+    After this maximum lifetime has elapsed since the rxkad.keytab file
+    was installed, and all server processes have been restarted, then
+    it is safe to remove the old keys from the KeyFile.
+
+    However, on OpenAFS 1.4.15, it is not safe to remove the KeyFile entirely.
+    The presence of keys within a KeyFile is used internally to signal
+    whether server-to-server authentication is possible, and changing this
+    functionality to reflect the rxkad-k5 extension is too invasive to be
+    included in the 1.4.15 security release.  Instead, new, random, keys
+    are installed on each server to signal that server-to-server (and,
+    equivalently, "localauth") are possible, but these new keys are not used
+    for encryption of any actual traffic. [0]
+
+    Once it is time to remove old keys from the KeyFile, use 'bos listkeys'
+    to determine which keys need to be removed:
+	$ bos listkeys localhost -localauth
+	key 3 has cksum 4839271849
+	key 4 has cksum 6172839943
+    The 'asetkey list' command will also show which kvnos are in use, but
+    lists the raw hex keys.  'bos listkeys' shows only a checksum of the
+    keys, so the output is less sensitive.  We now introduce a random key
+    with an unused kvno; in this example, kvno 1 is chosen.
+
+    DES keys occupy 64 bits but have only 56 bits of entropy; the remaining
+    eight bits are parity bits, so a raw random bitstring is not suitable
+    for use as a key.  Short perl and python programs that will print a
+    DES key with valid parity are provided in the footnote [1].
+    As with the output of 'asetkey list', as mentioned in how-to-rekey.txt,
+    IF SOMEONE CAN SEE THIS OUTPUT, THEY CAN COMPROMISE YOUR CELL.
+
+    In particular, using this key as an argument to an 'asetkey' command
+    line makes the key visible to any other users on the system via the
+    process table.  An alternative route is to use 'bos addkey -server
+    localhost -kvno <kvno> [-localauth]', which will give a prompt for
+    the key (and not echo it).  Care should be taken to only use an
+    OpenAFS 1.4 series bos binary, as an OpenAFS 1.6 series bos may not
+    function properly in this situation.
+
+    For this example, we'll assume that all machines on the
+    system are trusted, and the python/perl snippet has printed
+    the key 'f26808eb1ff43b81'.  We can then run:
+	$ asetkey add 1 f26808eb1ff43b81
+    to add this key to the KeyFile on this server.  Each server should get
+    a different key, ideally  with a different kvno.  However, the kvno of
+    the new key should not be equal to or larger than an existing key in
+    the KeyFile.  For example, on a second server in the cell which has
+    untrusted local users, we might run the following, using as the
+    input key 6ba7ea7fa415265d:
+	$ bos addkey -server localhost -kvno 2 -localauth
+	input key:
+	Retype input key:
+    The asetkey utility updates the "last modified" time on the server
+    CellServDB file so that the presence of the new key is detected
+    immediately; using 'bos addkey' also performs this update.
+
+    Once all servers have their own unique random key in place, the old
+    cell-wide keys can be removed from the KeyFile on each server; in the
+    above example:
+	asetkey delete 3
+	asetkey delete 4
+    It is advisable to retain a copy of the KeyFile from before the old keys
+    are deleted, in case something goes wrong with the transition and the
+    old keys need to be reinstated.
+
+7.  Check server status with 'bos status' and confirm in the server logs
+    that all servers are functioning normally.  If servers are failing
+    to process data, the KeyFile can be restored during debugging.
+
+
+[0] The security properties of a setup with an unused random key in the
+    KeyFile are, for the most part, reasonable.  The main vulnerability
+    in the standard KeyFile setup is that the key in the KeyFile is known
+    to the Kerberos KDC, and an attacker can get a service ticket from the
+    KDC to effect a brute-force attack.  When the key is not known to the
+    KDC, a hypothetical attacker cannot easily get a ciphertext/plaintext
+    pair to attack.  If a key in the KeyFile is mistakenly used for outgoing
+    server-to-server authentication, an attacker who can snoop on the network
+    can sniff the printed Kerberos ticket used to authenticate the
+    server-to-server connection, and perform a brute-force attack on that
+    ticket.  This class of attack requires local network access which is
+    generally less accessible to the attacker than obtaining a service ticket
+    from the KDC.  However, in some environments, it may still present a
+    realistic attack.  In order to detect if a key in the KeyFile is
+    mistakenly used for outgoing server-to-server authentication, we advise
+    using different random keys with different kvnos on each server.  If
+    a key is mistakenly used, an active attacker could sniff the corresponding
+    Kerberos ticket and apply a brute-force attack, but an error will appear
+    in the server logs indicating that the wrong key was used.  An alert
+    administrator can take corrective action in such a situation.
+    In a properly functioning configuration where KeyFile keys are not
+    used for outgoing traffic, only online attacks against the DES key are
+    possible.  Such online attacks cannot benefit from the dedicated hardware
+    which provide quick brute-forcing of DES, and are relatively easy to
+    detect.
+
+[1] The following python snippet reads eight random bytes from /dev/random,
+    then fixes up the parity bits, and prints the result as a hex string.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+import binascii
+
+keybytes=bytearray(open("/dev/random","rb").read(8))
+key = bytearray(0)
+for i in keybytes:
+    b = bin(i & 0xfe)
+    nb = len(b.split('1'))
+    # nb is one more than the number of bits set
+    key.append(int(b, 2) + (nb % 2))
+print binascii.hexlify(key)
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    The following short perl program performs the same function.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+#!/usr/bin/perl
+
+use strict;
+use warnings;
+
+# read in 8 bytes from /dev/random
+my $randfile = "/dev/random";
+open(RND, "< $randfile")
+	or die "Cannot open $randfile: $!";
+
+my $bytes = '';
+read(RND, $bytes, 8) == 8
+	or die "Unable to read 8 bytes from $randfile: $!";
+
+close(RND);
+
+my $bitstring = unpack("B64", $bytes);
+
+print "random DES key: ";
+
+for my $off (0..7) {
+	# get the bitstring for the $off'th byte
+	my $byte = substr($bitstring, $off * 8, 8);
+
+	# trim off the last bit
+	chop($byte);
+
+	# how many "1"s do we have?
+	my $n_ones = () = ($byte =~ m/1/g);
+
+	# make sure we have an odd number of ones
+	if ($n_ones % 2 == 0) {
+		$byte .= "1";
+	} else {
+		$byte .= "0";
+	}
+
+	# print our byte back out in hex
+	print unpack("H2", pack("B8", $byte));
+}
+
+print "\n";
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

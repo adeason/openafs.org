@@ -1,0 +1,637 @@
+How to generate rxkad.keytab for rxkad-k5 deployment
+
+This document provides information on how to generate new keys for the AFS
+Kerberos V service principal, as part of deploying rxkad-k5. This is not a
+guide for the entire rxkad-k5 deployment procedure, but just a single step;
+this document is intended to be read along with the rest of the rxkad-k5
+upgrade documentation (install-rxkad-k5-1.6.txt or install-rxkad-k5-1.4.txt,
+as appropriate).  This document will provide detailed steps for this process
+for environments with KDCs running MIT Kerberos, Heimdal Kerberos, and
+Microsoft's Active Directory. Most of the instructions in this document are
+specific to which KDC you are running.
+
+There is more than one way to perform this procedure. This document will cover
+a few different ways this can be performed, roughly starting with the most
+basic instructions, and ending with more advanced techniques. The "basic"
+instructions are intended to be more likely to work in any situation, but have
+some downsides (such as downtime). The more "advanced" techniques can allow
+for a smoother transition, but may require more experience or knowledge in
+order to work.
+
+Most of the instructions in this document assume you are using an AFS service
+principal of the form afs/cell@REALM, not afs@REALM. For all mentions of
+afs/cell@REALM, replace "cell" with the full name of your cell, and REALM with
+the name of your Kerberos realm. Most of the instructions here can be used for
+environments with an afs@REALM principal as well, but if you are using an
+afs@REALM principal, you may want to transition to an afs/cell@REALM principal
+while performing this procedure (specific instructions on this are provided
+below, in the "afs/cell Transition Procedure").
+
+Note for Heimdal
+================
+
+If you are not using Heimdal, skip this section.
+
+Users of Heimdal may find this rekeying procedure a bit confusing, since there
+are two different bugs in various Heimdal versions that change what the proper
+rekeying procedure is. These are arguably not actually "bugs", but rather
+simply changes in behavior, but this document will treat them as bugs for the
+purposes of discussing them.
+
+One such bug causes the session key enctype and the enctype for encrypting a
+service ticket to always be the same. This prevents old AFS clients from
+obtaining a DES session key with a service ticket encrypted with a non-DES
+enctype, which is critical for backwards compatiblity during rxkad-k5
+deployment. To test whether you are affected by this bug, make a service
+principal of the form afs/testcell@REALM, and try to acquire a DES session key
+with a service ticket encrypted with a non-DES enctype for that principal. If
+you can only acquire tickets where the session key enctype and the service
+ticket enctype is the same, or if the KDC refuses the request entirely, then
+your KDC is affected by this bug. If you do not patch or upgrade your KDC to
+fix this behavior, you must upgrade all authenticating AFS clients before
+following the procedures in this document, or they will not be able to
+authenticate.
+
+Another bug causes old AFS clients to be unable to obtain a DES session key for
+a service ticket if the relevant service principal does not contain a DES
+long-term key. To test whether you are affected by this bug, try to obtain a DES
+session key for a service principal that does not have a DES long-term key. If
+you cannot, then your KDC is affected by this bug. If you do not patch or
+upgrade your KDC to fix this behavior, you must create a DES long-term key for
+the AFS service principal, but you must NOT include that DES long-term key in
+rxkad.keytab. If you do not do that, old clients will not be able to
+authenticate to AFS.
+
+Many, if not all, versions of Heimdal prior to and including 1.5.3 are affected
+by both of these bugs. Regardless of the version number reported, you should
+verify whether your KDC is affected by these bugs before proceeding. There are
+patches available from Heimdal to fix these issues.
+
+For simplicity, the Heimdal procedures in this document assume that your KDC is
+not affected by either of these bugs. If your KDC is affected by either of the
+bugs and you wish to proceed anyway, make sure you take the appropriate measures
+as suggested in this section. If it is unclear as to what the appropriate
+measures are, please ask your support vendor or the community for more details.
+
+Note for older systems
+======================
+
+If you are certain that all of your machines running OpenAFS server processes
+support AES256 encryption in their krb5 library, skip this section. Generally
+all "modern" software will support AES256, but read this section if you are
+unsure.
+
+This section is also only for enctype compatibility with OpenAFS servers; for
+OpenAFS clients, this is usually not an issue. Clients do not need to interpret
+encrypted service tickets at all, and session key enctype selection is usually
+not an issue since the client and KDC can negotiate a session key enctype
+during token acquisition.
+
+The examples in this document assume that you will be using AES256 encryption
+for your new long-term keys. While you may use any encryption you want, AES256
+is currently a common default, and is often a good choice. However, if you use
+an encryption type for the afs/cell service principal that is not supported by
+the krb5 library on one of your cell's OpenAFS fileservers or database servers,
+that server will not function properly. So, for example, if you use the default
+AES256 encryption type, and a fileserver does not support AES256, that
+fileserver will be unable to handle encrypted connections, and suffer other
+problems.
+
+Possibly the most modern system that does not support AES256 by default is
+Solaris 10 Update 3, but of course any sufficiently old system will also not
+support it. If you are not sure, you can try to test if the system supports an
+encryption type before performing the migration procedure in this document. On
+Solaris, or any system with MIT krb5, you can run commands similar to the
+following to test AES256:
+
+$ ktutil
+ktutil:  addent -password -p afs/cell@REALM -k 2 -e aes256-cts
+Password for afs/cell@REALM:
+
+If the system does not support AES256, you should instead see an error like the
+following:
+
+$ ktutil
+ktutil:  addent -password -p afs/cell@REALM -k 2 -e aes256-cts
+addent: Bad encryption type while adding new entry
+
+If a server does not support the encryption type you want to use, you have a
+few options:
+
+ - Use a different encryption type for the afs/cell service principal. For
+   example, don't use AES256.
+ - Upgrade the system krb5 library to support the desired encryption type. On
+   Solaris 10, you need the SUNWcry and SUNWcryr packages installed to support
+   AES256 (these are installed by default in Solaris 10 Update 4 and later).
+ - Compile and install your own krb5 library, which supports the desired
+   encryption type, and build OpenAFS linked against that library.
+ - Decommission the server.
+
+If you use, for example, an AES256 key for the afs/cell service principal, and
+a server does not support AES256, you will see errors such as "security object
+was passed a bad ticket", or code 19270407. Note that there are many situations
+that can result in that error message, though; an enctype mismatch is just one
+possible reason out of many.
+
+"Basic" Procedure
+=================
+
+In this procedure, we will change the keys of the AFS service principal as a
+realm administrator, and extract those keys to a file called rxkad.keytab.
+This file must be distributed to all AFS fileservers and database servers as
+quickly as possible, as explained in the rxkad-k5 upgrade documentation. Note
+that the krb5 realm administrators may be separate people from the AFS cell
+administrators.  If you are an AFS cell administrator but not an administrator
+of the Kerberos realm, you will need the assistance of a Kerberos realm
+administrator to complete this procedure.
+
+The downside of this procedure is that it requires the cooperation of a realm
+administrator, and all authenticated access to AFS will fail after this
+procedure is complete, until you distribute rxkad.keytab to all servers.
+However, it should work in all scenarios, and is easy to perform (if you have
+administrative access to the realm database).
+
+MIT Kerberos:
+
+Run 'kadmin' with administrator credentials, or run 'kadmin.local' as root on
+the KDC. From the kadmin/kadmin.local prompt, run:
+
+kadmin: ktadd -k /tmp/rxkad.keytab afs/cell
+
+If successful, you should see kadmin output something like:
+
+Entry for principal afs/cell with kvno 3, encryption type AES-256 CTS mode with 96-bit SHA-1 HMAC added to keytab WRFILE:/tmp/rxkad.keytab.
+Entry for principal afs/cell with kvno 3, encryption type AES-128 CTS mode with 96-bit SHA-1 HMAC added to keytab WRFILE:/tmp/rxkad.keytab.
+Entry for principal afs/cell with kvno 3, encryption type Triple DES cbc mode with HMAC/sha1 added to keytab WRFILE:/tmp/rxkad.keytab.
+Entry for principal afs/cell with kvno 3, encryption type ArcFour with HMAC/md5 added to keytab WRFILE:/tmp/rxkad.keytab.
+
+Now the keys for the AFS service principal have been changed, and the new keys
+have been written to /tmp/rxkad.keytab.
+
+Exactly which encryption types are written to that keytab (and mentioned in
+the above kadmin output) depends on your local configuration. The default
+encryption types given by the KDC are probably fine, as long as single-DES is
+not one of them. If you want to specify exactly which encryption types to use,
+give the -e option to ktadd. To get the enctypes in the above example, for
+example:
+
+kadmin:  ktadd -k /tmp/rxkad.keytab -e "aes256-cts-hmac-sha1-96:normal aes128-cts-hmac-sha1-96:normal des3-hmac-sha1:normal arcfour-hmac-md5:normal" afs/cell
+Entry for principal afs/cell with kvno 3, encryption type AES-256 CTS mode with 96-bit SHA-1 HMAC added to keytab WRFILE:/tmp/rxkad.keytab.
+Entry for principal afs/cell with kvno 3, encryption type AES-128 CTS mode with 96-bit SHA-1 HMAC added to keytab WRFILE:/tmp/rxkad.keytab.
+Entry for principal afs/cell with kvno 3, encryption type Triple DES cbc mode with HMAC/sha1 added to keytab WRFILE:/tmp/rxkad.keytab.
+Entry for principal afs/cell with kvno 3, encryption type ArcFour with HMAC/md5 added to keytab WRFILE:/tmp/rxkad.keytab.
+
+Heimdal Kerberos:
+
+Run 'kadmin' with administrator credentials, or run 'kadmin -l' as root on the
+KDC. Then run:
+
+kadmin> passwd --random-key afs/cell
+kadmin> ext_keytab -k /tmp/rxkad.keytab afs/cell
+kadmin> exit
+$ ktutil -k /tmp/rxkad.keytab remove -e des-cbc-crc
+$ ktutil -k /tmp/rxkad.keytab remove -e des-cbc-md5
+$ ktutil -k /tmp/rxkad.keytab remove -e des-cbc-md4
+
+That should create new keys for the AFS service principal with the default
+encryption types. The default enctypes are probably fine, but if you want to
+inspect them, they are listed in the output of 'get afs/cell' in kadmin. If
+your version of Heimdal is new enough, you can alter the enctype list using
+the commands del_enctype and add_enctype before running ext_keytab. Note that
+the resulting rxkad.keytab file must NOT contain any single DES keys (even if
+the service principal contains a DES long-term key, which is okay).
+
+The 'ktutil' commands above ensure that the keytab contains no DES keys. Those
+'ktutil' commands may fail with 'Key table entry not found' if they already
+contain no DES keys; if that happens, ignore the error.
+
+Active Directory:
+
+With Active Directory, it is possible to extract keys for the AFS service
+principal using ktpass (a Windows utility) or msktutil (a Unix/Linux utility).
+Using these two tools are treated separately immediately below.
+
+These instructions assume you have a service principal afs/cell@REALM that is
+mapped to the user account "afs-cell". If the user account used for the AFS
+service principal is named something else, replace "afs-cell" with the name of
+the user account.
+
+Active Directory (ktpass):
+
+Note: In general it is recommended to use the ktpass command that ships with
+the latest version of AD that is used in the domain, wherever possible. You
+also must avoid using the ktpass from Windows 2003 packages, as it is known to
+produce incorrect keytabs.
+
+1. First, we must determine what encryption type we should extract from AD
+   with ktpass. If you are running ktpass on Windows 2008 R2 or later, it is
+   recommended that you skip this and instead extract all enctypes (skip ahead
+   to step 2). Alternatively, if you somehow know what enctype should be used
+   via other means, you can also avoid this and skip ahead to step 2.
+
+   Otherwise, we must try to determine what enctype AD will use when issuing
+   service tickets for the AFS service principal. This is necessary because
+   specifying enctypes to the "ktpass" command does not alter what enctypes AD
+   will use for issuing service tickets, so we must know in advance what
+   enctype to extract. In addition, versions of ktpass older than Windows 2008
+   R2 are not able to extract more than one enctype for the same password, so
+   we must pick the right one.
+
+   One way to estimate this is to create a new account in AD with all default
+   settings, set up a service principal for it, and acquire a service ticket
+   for that principal and see what enctype is issued. So, create a new user
+   account called, for example, "test". Then run the following ktpass command
+   as an administrator on a Domain Controller:
+
+C:\>ktpass /princ test/test.example.com@REALM /mapuser test /mapop add /out test.keytab +rndpass /ptype KRB5_NT_PRINCIPAL +dumpsalt
+Targeting domain controller: dc.example.com
+Using legacy password setting method
+Successfully mapped test/test.example.com to test.
+Building salt with principalname test/test.example.com and domain REALM (encryption type 23)...
+Hashing password with salt "REALMtesttestexamplecom".
+Key created.
+Output keytab to test.keytab:
+Keytab version: 0x502
+keysize 72 test/test.example.com@REALM ptype 1 (KRB5_NT_PRINCIPAL) vno 2 etype 0x17 (RC4-HMAC) keylength 16 (0xdeadbeefdeadbeefdeadbeefdeadbeef)
+
+   You can remove the test.keytab file; it is not needed. Then from a Unix
+   machine with MIT Kerberos, run the following using a regular user account:
+
+$ kinit myaccount@REALM
+Password for myaccount@REALM
+$ kvno test/test.example.com
+test/test.example.com@REALM: kvno = 2
+$ klist -e
+[...]
+07/11/13 15:39:48  07/12/13 15:39:44  test/test.example.com@REALM
+        Etype (skey, tkt): AES-256 CTS mode with 96-bit SHA-1 HMAC, AES-256 CTS mode with 96-bit SHA-1 HMAC
+
+   The line under the test/test.example.com@REALM shows the enctype for the
+   service ticket for the test principal; you are looking for the last enctype
+   listed (the one after the comma). In the example above, it shows an
+   AES256-SHA1 service ticket. If it instead mentions "AES-128", AD is issuing
+   AES128-SHA1 service tickets. If it instead mentions "ArcFour with HMAC", AD
+   is issuing RC4-HMAC-NT service tickets.
+
+   Once this test is done, you can remove the test account from AD.
+
+2. Run ktpass to extract new keys for the AFS service principal. For Windows
+   Server 2008 R2 and later, run the following as an administrator on a Domain
+   Controller:
+
+   Note that the command provided here displays the raw long-term keys of the
+   AFS service principal. The integrity of these keys is required for the
+   integrity of the cell. IF SOMEONE CAN SEE THIS OUTPUT, THEY CAN COMPROMISE
+   YOUR CELL. Be extremely careful with the output of this command.
+
+C:\>ktpass /princ afs/cell@REALM /mapuser afs-cell /mapop add /out rxkad.keytab +rndpass /crypto all /ptype KRB5_NT_PRINCIPAL +dumpsalt
+Targeting domain controller: dc.example.com
+Using legacy password setting method
+Successfully mapped afs/cell to afs-cell.
+Building salt with principalname afs/cell and domain REALM (encryption type 1)...
+Hashing password with salt "REALMafscell".
+Key created.
+Building salt with principalname afs/cell and domain REALM (encryption type 3)...
+Hashing password with salt "REALMafscell".
+Key created.
+Building salt with principalname afs/cell and domain REALM (encryption type 23)...
+Hashing password with salt "REALMafscell".
+Key created.
+Building salt with principalname afs/cell and domain REALM (encryption type 18)...
+Hashing password with salt "REALMafscell".
+Key created.
+Building salt with principalname afs/cell and domain REALM (encryption type 17)...
+Hashing password with salt "REALMafscell".
+Key created.
+Output keytab to rxkad.keytab:
+Keytab version: 0x502
+keysize 53 afs/cell@REALM ptype 1 (KRB5_NT_PRINCIPAL) vno 5 etype 0x1 (DES-CBC-CRC) keylength 8 (0xd34dbeefd34dbeef)
+keysize 53 afs/cell@REALM ptype 1 (KRB5_NT_PRINCIPAL) vno 5 etype 0x3 (DES-CBC-MD5) keylength 8 (0xd34dbeefd34dbeef)
+keysize 61 afs/cell@REALM ptype 1 (KRB5_NT_PRINCIPAL) vno 5 etype 0x17 (RC4-HMAC) keylength 16 (0xbaddcafebaddcafebaddcafebaddcafe)
+keysize 77 afs/cell@REALM ptype 1 (KRB5_NT_PRINCIPAL) vno 5 etype 0x12 (AES256-SHA1) keylength 32 (0xbaddcafebaddcafebaddcafebaddcafebaddcafebaddcafebaddcafebaddcafe)
+keysize 61 afs/cell@REALM ptype 1 (KRB5_NT_PRINCIPAL) vno 5 etype 0x11 (AES128-SHA1) keylength 16 (0xbaddcafebaddcafebaddcafebaddcafe)
+
+   Note: The ktpass command may generate a keytab containing single DES keys.
+   This does not mean that single DES will be used for AFS service tickets issued
+   by AD; the keys generated by ktpass do not impact what AD selects for service
+   key enctypes.
+
+   For versions older than Windows Server 2008 R2, ktpass does not have the
+   '/crypto all' option. Instead pass the appropriate crypto option as
+   determined in the previous step (either '/crypto AES256-SHA1', '/crypto
+   AES128-SHA1', or '/crypto RC4-HMAC-NT').
+
+   Once that ktpass command has been run, you now have an rxkad.keytab to
+   distribute amongst servers.
+
+3. Turn off the "DES only" attribute on the afs-cell account (ktpass can only
+   turn this on; it cannot turn it off). This attribute was set when the AFS
+   service principal only used DES keys, but now must be cleared, or we will
+   continue to use DES for the AFS service principal. To do this, open the
+   properties for the AFS account, go to the "Account" tab, and in the
+   "Account options:" find the checkbox for "Use Kerberos DES encryption types
+   for this account". Make sure the checkbox is cleared, and click "OK".
+
+   Specifically what we need to do is clear the USE_DES_KEY_ONLY bit
+   (0x200000) from the userAccountControl attribute, and (if necessary) clear
+   bits 0x3 from msDS-SupportedEncryptionTypes. But the above instructions
+   should take care of that.
+
+4. If you used '/crypto all' above, it is strongly recommended that you remove
+   single DES enctypes from the resultant rxkad.keytab file before distributing
+   rxkad.keytab to any AFS servers. After you transfer the keytab to a Unix
+   machine, you can do this by using the 'ktutil' command. If the Unix machine
+   has MIT Kerberos installed, run something like this to remove DES keys:
+
+$ ktutil
+ktutil: rkt /tmp/rxkad.keytab
+ktutil: list -e
+slot KVNO Principal
+---- ---- ---------------------------------------------------------------------
+   1    5                  afs/cell@REALM (DES cbc mode with CRC-32)
+   2    5                  afs/cell@REALM (AES-256 CTS mode with 96-bit SHA-1 HMAC)
+   3    5                  afs/cell@REALM (AES-128 CTS mode with 96-bit SHA-1 HMAC)
+   5    5                  afs/cell@REALM (ArcFour with HMAC/md5)
+ktutil: delent 1
+ktutil: wkt /tmp/rxkad.nosingledes.keytab
+ktutil: exit
+
+   Use the 'delent' command to remove each slot that contains a single DES key.
+   In the above example, we only needed to remove slot 1, but the relevant slot
+   number may be different. Note that the slot numbers do change when you
+   remove or add entries, so run 'list -e' between each one to make sure what
+   you are deleting.
+
+   If the Unix machine has Heimdal Kerberos installed, run the following to
+   remove DES keys:
+
+$ ktutil -k /tmp/rxkad.keytab remove -e des-cbc-crc
+$ ktutil -k /tmp/rxkad.keytab remove -e des-cbc-md5
+
+   And run 'ktutil -k /tmp/rxkad.keytab list' to verify what is in the keytab.
+
+Active Directory (msktutil):
+
+Alternatively, instead of using ktpass from a Windows machine, you can run a
+tool called msktutil from any Unix machine in the realm. You must use msktutil
+version 0.5 or newer, for the --use-service-account and --account-name
+options. Run the following commands to obtain and use administrator Kerberos
+tickets for extracting the keytab:
+
+$ kinit Administrator@REALM
+Password for Administrator@REALM
+$ msktutil -k /tmp/rxkad.keytab --use-service-account --account-name afs-cell -u --service afs/cell --user-creds-only
+
+Optionally, also give msktutil the --verbose option if you want to see more
+information about what's going on. If no errors are printed, /tmp/rxkad.keytab
+should now have valid new keys for the AFS service principal.
+
+Administrator-less Procedure
+============================
+
+This procedure is largely the same as the "basic" procedure above, but does
+not require the use of administrator credentials. In most cases, you can use
+the existing AFS service key to rekey the cell.
+
+The downside of this procedure is that all authenticated access to AFS will
+fail after this procedure is complete, but before you distribute rxkad.keytab
+to all servers. This procedure also generally does not work with Active
+Directory. However, you can run it without the intervention of a realm
+administrator, and it should almost always work (except for Active Directory).
+
+First, regardless of the KDC in use, you need a keytab for the existing AFS
+service principal. If you don't already have one, it is possible to construct
+one from the existing KeyFile using 'asetkey' and the 'ktutil' from MIT
+Kerberos or Heimdal Kerberos. The 'asetkey' program comes from OpenAFS, but
+sometimes may be packaged separately from other OpenAFS components in a
+package named 'openafs-krb5' or similar.
+
+With the aforementioned asetkey and ktutil, run the following:
+
+Note that the command provided here displays the raw long-term keys of the AFS
+service principal. The integrity of these keys is required for the integrity
+of the cell. IF SOMEONE CAN SEE THIS OUTPUT, THEY CAN COMPROMISE YOUR CELL. Be
+extremely careful with the output of this command.
+
+# asetkey list
+kvno    2: key is: d34dbeefd34dbeef
+kvno    1: key is: baddc4febaddc4fe
+All done.
+
+Again, note that the output of 'asetkey list' is sensitive; do not share it
+with others.
+
+Use the output from 'asetkey list' to complete the steps below.
+
+MIT Kerberos:
+
+Run the following commands in ktutil to create a keytab for the existing (old)
+AFS service principal:
+
+# ktutil
+ktutil:  add_entry -key -p afs/cell -k 2 -e des-cbc-crc
+Key for afs/cell@REALM (hex): d34dbeefd34dbeef
+ktutil: write_kt /tmp/afs.keytab
+ktutil: exit
+
+For the ktutil add_entry command, use the key information listed by
+'asetkey'.  In the above example, the kvno we want to use is 2, and the key we
+want to use is 0xd34dbeefd34dbeef. You probably want to use the key listed by
+asetkey that has the highest kvno, but if that does not work, you may want to
+try with the other keys listed, if there are any.
+
+Now that you have a keytab for the existing AFS service principal, run the
+following to get a kadmin command prompt:
+
+# kadmin -k -t /tmp/afs.keytab -p afs/cell
+
+From that kadmin command prompt, you should now be able to run the necessary
+kadmin commands specified in the "Basic" Procedure above. See that section for
+the commands to run.
+
+Heimdal Kerberos:
+
+It is possible to use either 'ktutil copy' or 'ktutil add' to generate the AFS
+service principal keytab. Using 'ktutil copy' is generally more convenient,
+but requires the local OpenAFS configuration to be both correct, and findable
+by 'ktutil'. The following instructions use 'ktutil add', but 'ktutil copy'
+will also work, if you're sure the local OpenAFS configuration is correct.
+
+Run the following ktutil command to create a keytab for the existing (old) AFS
+service principal:
+
+# ktutil -k /tmp/afs.keytab add --principal=afs/cell --kvno=2 -e des-cbc-crc --hex
+Password:
+Verifying - Password:
+
+Note that even though ktutil appears to be prompting for a password, it is
+indeed asking for a hex key (since we passed the --hex option). Provide the
+key information listed by the 'asetkey' command from above. In the above
+example, the kvno we want to use is 2, and the key we want to give ktutil is
+d34dbeefd34dbeef. You probably want to use the key listed by asetkey that has
+the highest kvno, but if that does not work, you may want to try with the
+other keys listed, if there are any.
+
+Now that you have a keytab for the existing AFS service principal, run the
+following to obtain the new rxkad.keytab:
+
+# ktutil -k /tmp/afs.keytab change afs/cell
+# mv /tmp/afs.keytab /tmp/rxkad.keytab
+
+After this runs successfully, you now have an rxkad.keytab you can distribute
+to all of the AFS servers. Note that this rxkad.keytab also contains the old
+(DES) AFS key, in addition to the new keys. While this is generally not a
+problem, it may be confusing, so if you want to remove it, run the following
+ktutil command:
+
+# ktutil -k /tmp/rxkad.keytab remove -p afs/cell --kvno=2
+
+Make sure you give the kvno for the _old_ AFS service principal, as specified
+above (in the above example, our old kvno was 2). At any time you can check
+the contents of the keytab by running:
+
+# ktutil -k /tmp/rxkad.keytab list
+
+Active Directory:
+
+This procedure is not possible with Active Directory; Active Directory always
+requires the cooperation of a realm administrator in order to transition the
+AFS service key from DES to other enctypes. Specifically, clearing the
+USE_DES_KEY_ONLY bit from the AFS account's userAccountControl field cannot be
+done using only the keys for the AFS account.
+
+Note that it is possible to change the keys for the AFS service principal
+without an administrator, and then later get an administrator to allow non-DES
+enctypes on the account. While that still requires the cooperation of a realm
+administrator, it does not require an administrator for the critical step of
+distributing the new keytab. However, such a procedure is complex and is prone
+to errors that are difficult to recover from, so it is considered out of the
+scope of this document. Ask your support vendor or the community for details
+if you really want to pursue this rekeying procedure.
+
+afs/cell Transition Procedure
+=============================
+
+In this procedure, we will transition a cell from using an afs@REALM service
+principal into a cell using an afs/cell@REALM service principal, at the same
+time as changing the AFS service principal keys. This procedure can only be
+used when the existing cell uses an afs@REALM service principal.
+
+Note: it is strongly recommended that sites do NOT try to perform the reverse
+"transition" from afs/cell@REALM to afs@REALM in order to avoid downtime in a
+similar manner here. Using an afs@REALM service principal does not work in all
+environments or with all clients, and trying to transition to one may result
+in the cell appearing unusable until the problem can be rectified.
+
+The advantage of this procedure is that there is no extra downtime involved,
+unlike the above procedures. The downside to this procedure is that it
+requires realm administrator credentials, and it is a little bit more complex.
+But since this procedure involves no extra downtime, these downsides may be
+considered relatively minor.
+
+The specific steps to run for this procedure are not included here. However, a
+rough guideline is provided so that advanced administrators can still follow
+this procedure if they so desire:
+
+1. Create a new disabled afs/cell principal. The principal must be disabled
+   when it is created, so no clients try to use it.
+
+2. Extract keys for the afs/cell principal, the same way as in the "Basic"
+   Procedure above, to rxkad.keytab.
+
+3. Distribute the rxkad.keytab file to all servers, and perform restarts etc
+   as detailed in install-rxkad-k5-1.6.txt or install-rxkad-k5-1.4.txt.
+
+4. Enable the afs/cell@REALM principal. Clients will now start using the
+   afs/cell@REALM principal for authenticated access to AFS.
+
+5. Disable the afs@REALM principal.
+
+6. Wait for tokens to expire, and when everything is verified to still be
+   working, remove the afs@REALM principal when you remove the KeyFile.
+
+ktutil Procedure
+================
+
+This procedure is similar to the "Basic" procedure, except it avoids the extra
+downtime required by that procedure. In order to do this, we generate a random
+password, create a keytab based on that password with 'ktutil', and then
+change the password of the afs/cell principal to that password.
+
+The advantage of this procedure is that it avoids the extra downtime incurred
+by many of the other procedures. The downside is that this is more complex
+than the other procedures, and it may not work in all environments,
+particularly with Active Directory. It is not currently known how Active
+Directory determines what salt to use, and so it is unknown under what
+conditions this procedure may or may not work with Active Directory. And so,
+it is not recommended to use this procedure when using Active Directory,
+unless you are certain that ktutil and AD will generate the same key from the
+specified password.
+
+The instructions here are provided for MIT Kerberos' ktutil, and for Heimdal
+Kerberos' ktutil. These instructions can be used with any KDC; ktutil is only
+used to generate the keytab, which is a purely local operation and does not
+contact the KDC.
+
+1. Generate a password. Note that this does not need to be remembered by a
+   human, so it is recommended to just generate a long string of random
+   characters. One way to easily generate a suitable string is:
+
+$ openssl rand -base64 48
+tzu4Mb5cEoM3bhjk3KS+2zl7pTxQcQj7bO0sOK1wvqrj6skdjqjRz3DHk2kNHAO4
+
+   You may wish to modify the resulting string to ensure it contains at least
+   one character in each "character class" and doesn't contain the string
+   "afs", just to ensure the password does not get rejected by password
+   strength policies.
+
+2. Run the following in ktutil:
+
+For MIT Kerberos:
+
+$ ktutil
+ktutil: add_entry -password -p afs/cell@REALM -k 3 -e aes256-cts-hmac-sha1-96
+Password for afs/cell@REALM:
+ktutil: add_entry -password -p afs/cell@REALM -k 3 -e aes128-cts-hmac-sha1-96
+Password for afs/cell@REALM:
+ktutil: add_entry -password -p afs/cell@REALM -k 3 -e des3-hmac-sha1
+Password for afs/cell@REALM:
+ktutil: add_entry -password -p afs/cell@REALM -k 3 -e arcfour-hmac-md5
+Password for afs/cell@REALM:
+ktutil: write_kt /tmp/rxkad.keytab
+ktutil: exit
+
+For Heimdal Kerberos:
+
+$ ktutil -k /tmp/rxkad.keytab add --principal=afs/cell@REALM --kvno=3 --enctype=aes256-cts-hmac-sha1-96
+Password: 
+Verifying - Password:
+$ ktutil -k /tmp/rxkad.keytab add --principal=afs/cell@REALM --kvno=3 --enctype=aes128-cts-hmac-sha1-96
+Password: 
+Verifying - Password:
+$ ktutil -k /tmp/rxkad.keytab add --principal=afs/cell@REALM --kvno=3 --enctype=des3-cbc-sha1
+Password: 
+Verifying - Password:
+$ ktutil -k /tmp/rxkad.keytab add --principal=afs/cell@REALM --kvno=3 --enctype=arcfour-hmac-md5
+Password: 
+Verifying - Password:
+
+   You must add a key for every enctype that will be generated when you change
+   the password of the afs/cell service principal. Test changing the password
+   of another principal if you are unsure of what that list of enctypes will
+   be. If you miss an enctype, it is possible that authenticated accesses to
+   AFS may fail.
+
+   You also must type the same password for each of the added keys.  If one of
+   them is different from the others, some authenticated accesses to AFS may
+   fail.
+
+3. Distribute the generated rxkad.keytab to all servers in the cell, and
+   restart servers as necessary and follow the procedures in the rxkad-k5
+   upgrade documentation.
+
+4. Change the password of the afs/cell principal to the password you just used
+   to generate the given keytab. The KDC must allow DES session keys to be
+   issued for the AFS service principal in order for older clients to work. How
+   to ensure this is out of the scope of this document, and may depend on local
+   site policies and configuration.

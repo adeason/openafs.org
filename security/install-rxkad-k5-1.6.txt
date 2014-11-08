@@ -1,0 +1,123 @@
+How to deploy the rxkad-k5 and rxkad-kdf extensions on OpenAFS 1.6.5
+
+This document assumes a multi-server AFS cell which is already running
+a 1.6.x-series release on those servers.  The goal is to describe a
+procedure for enabling the rxkad-k5 and rxkad-kdf extensions for the
+servers in the cell with the minimal amount of user-visible disruption.
+
+In this document, the term "new code" means OpenAFS 1.6.5; the "old code"
+and "existing code" refer to the earlier version(s) of OpenAFS from the
+1.6.x series which were running in the cell prior to the upgrade process.
+
+The new codebase is designed to use the existing server codepath unless
+the new code path is explicitly enabled by the generation of an
+rxkad.keytab file.  As such, it is safe to deploy the updated software
+without any configuration changes; this will be a key component of the
+minimal-disruption upgrade.
+
+This document is written with the assumption that only a single Kerberos
+realm is used to provide authentication to the AFS cell.  If multiple
+Kerberos realms are in use (i.e., afs/cell@REALM and afs/cell@DOMAIN),
+then the Kerberos keys in both realms will need to be updated in step (4).
+The Kerberos keytab format allows the rxkad.keytab to hold keys for both
+afs/cell@REALM and afs/cell@DOMAIN regardless of their respective kvnos.
+All keys in the rxkad.keytab will be tried for decrypting incoming requests,
+so such multi-realm setups should continue to function as previously.
+
+1.  Ensure that you have binaries available for all servers in the cell.
+    This could be from the OS package manager, local builds, binaries
+    downloaded from openafs.org, etc..  It is necessary to upgrade the
+    installed software on all servers before enabling the rxkad-k5 and
+    rxkad-kdf extensions.
+
+2.  Install the new software on all servers in the cell.  It is not necessary
+    to install the new software on all machines simultaneously (within the
+    constraints of the urgency of the update); a few machines can take
+    the update early to "bake in" and ensure that no problems develop.
+    Be sure to restart the server processes ("bos restart [servername]
+    -bosserver") so that the new software is running, including the bosserver.
+    This server restart may cause a user-visible 'blip' to clients accessing
+    that server.  If time permits, evacuating all data volumes off the server
+    being restarted will reduce the chance of disruption being visible
+    to clients.
+
+3.  Ensure that it is possible to generate a new long-term Kerberos key
+    for the AFS service principal.  This could be by having a
+    domain/realm administrator with sufficient privilege to extract a
+    new keytab for the service principal, or by having the existing key
+    in a krb5 keytab, or by knowing the password of the service principal
+    (if its key is password-based instead of random).  If the AFS service's
+    long-term key is only available in the AFS KeyFile and no realm
+    administrator is available, it will be necessary to extract the key
+    from the KeyFile and generate a keytab from it.  The companion document
+    how-to-rekey.txt has detailed instructions for how a new long-term key can
+    be generated (tailored for MIT, Heimdal, and AD KDC deployments) as well
+    as instructions for how an AFS KeyFile may be converted into a krb5
+    keytab (if necessary).
+
+4.  Using the mechanism from (3), rekey the cell, with the new krb5 key
+    being of a strong enctype (AES is recommended, but other enctypes
+    may be used if not all the AFS servers support AES).  A general treatment
+    of how to rekey a cell is presented in a companion document,
+    how-to-rekey.txt.  There are many considerations to the rekeying procedure;
+    it is advisable to read that procedure multiple times and fully
+    understand it before beginning.  After rekeying, the new krb5 key should
+    be retained in krb5 keytab form (the asetkey utility is *not* used),
+    and stored in a file named 'rxkad.keytab' in the server configuration
+    directory (the one with the KeyFile).
+    On a Debian system, this would be something like:
+	mv /tmp/rxkad.keytab /etc/openafs/server/rxkad.keytab
+    On FreeBSD:
+	mv /tmp/rxkad.keytab /usr/local/etc/openafs/server/rxkad.keytab
+    With the traditional Transarc paths:
+	mv /tmp/rxkad.keytab /usr/afs/etc/rxkad.keytab
+    Be sure to retain the existing KeyFile -- the KeyFile and rxkad.keytab
+    must both be present in the server configuration directory at this point!
+    Once the key is changed in the Kerberos database, any new service
+    tickets issued to clients (e.g., by running aklog) will be encrypted
+    with the new key; AFS servers will be able to decrypt the tokens generated
+    from those service tickets as soon as the rxkad.keytab file is in place.
+    As described in the rekeying procedure, make the time gap between
+    generating a new key in the Kerberos database and the installation of
+    the rxkad.keytab on the AFS servers as small as possible.  Since the
+    KeyFile remains in place, existing AFS tokens continue to work.
+
+5.  The creation of an rxkad.keytab file only changes the behavior of
+    running server processes by allowing them to decrypt incoming tokens.
+    Existing server-to-server connections will continue to use the
+    preexisting printed tokens, which are essentially krb4 tickets (and
+    as such are using a DES key from the KeyFile).  Server-to-server
+    communications will be refreshed to use the new key when server processes
+    restart, so the next step is to use 'bos restart -all' to refresh
+    the server-to-server communications.  Again, there may be a user-visible
+    'blip' to clients accessing a server when its processes are restarted.
+    'bos restart -bosserver' should not be needed at this step.
+
+    The server-to-server communication logic is also used with the
+    '-localauth' switch for the client utilities.  The rxkad-k5 extension
+    allows these "localauth" connections to use the newly-created
+    rxkad.keytab for authentication; any machines (in addition to the actual
+    AFS servers) which use a KeyFile for this "localauth" functionality
+    will need to have the rxkad.keytab copied to them and have the
+    upgraded software.
+
+6.  For a minimal-impact transition, the old keys in the KeyFile should
+    be retained until all existing tokens have expired.  Printed tokens
+    used for server-to-server communications never expire, so the server
+    restarts of step (5) are necessary.  The maximum lifetime for tokens
+    issued by the KDC will be determined by the KDC configuration.
+    An indication of this maximum lifetime can be obtained by requesting
+    absurdly long-lived tickets ('kinit -l1000d -r1000d') and examining
+    the output of 'klist' to see what lifetime was actually issued.
+    After this maximum lifetime has elapsed since the rxkad.keytab file
+    was installed, and all server processes have been restarted, then
+    it is safe to remove the old keys from the KeyFile.
+
+    On OpenAFS 1.6.5, this is best achieved by renaming the KeyFile out
+    of the way, but retaining it so that it can be reinstated if one of
+    the previous steps was incomplete.  Be sure to run 'touch CellServDB'
+    so that the configuration change is detected.
+
+7.  Check server status with 'bos status' and confirm in the server logs
+    that all servers are functioning normally.  If servers are failing
+    to process data, the KeyFile can be restored during debugging.

@@ -1,0 +1,79 @@
+Topic: Denial of service attack against OpenAFS fileserver processes
+      CVE-2014-0159
+
+Issued:		14-April-2014
+Last Update:    14-April-2014
+Affected:	OpenAFS file servers
+			running versions 1.4.8 thru 1.6.6
+
+An attacker with the ability to connect to an OpenAFS fileserver can
+trigger a buffer overflow, crashing the server.
+
+Clients are not affected.
+
+SUMMARY
+=======
+
+The GetStatistics64 remote procedure call (RPC) was introduced in
+OpenAFS 1.4.8 as part of the support for fileserver partitions larger
+than 2 TiB. The GetStatistics64 RPC is used by remote administrative
+programs to retrieve statistical information about fileservers. The
+GetStatistics64 RPC requests do not require authentication.
+
+A bug has been discovered in the GetStatistics64 RPC which can trigger a
+fileserver crash.  The version argument of the GetStatistics64 RPC is
+used to determine how much memory is allocated for the RPC reply.
+However the range of this argument is not validated, allowing an
+attacker to cause insufficient memory to be allocated for the
+statistical information reply buffer.
+
+
+IMPACT
+======
+
+By sending an unauthenticated request for fileserver statistical
+information, it is possible to crash a file server running the
+affected code.
+
+No publicly available exploits are currently known.
+
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS 1.4.8 to (and including) 1.6.6
+
+
+FIXES
+=====
+
+The OpenAFS project recommends that administrators upgrade to OpenAFS version
+1.6.7 or newer.
+
+For those sites unable, or unwilling, to upgrade a patch which resolves this
+issue is available directly from:
+
+  http://www.openafs.org/security/openafs-sa-2014-001.patch
+
+Note that this patch is against 1.6.6. For the 1.4 series, use the following
+patch:
+
+  http://www.openafs.org/security/openafs-sa-2014-001-1.4.patch
+
+The latest stable OpenAFS release is always available from
+http://www.openafs.org/release/latest.html
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+  http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+  http://www.openafs.org/
+
+
+ACKNOWLEDGEMENTS
+================
+
+This issue was identified by Michael Meffie.

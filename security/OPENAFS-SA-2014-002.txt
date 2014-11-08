@@ -1,0 +1,72 @@
+Topic: Use of uninitialized memory in OpenAFS fileserver
+       CVE 2014-4044
+
+Issued:         12-June-2014
+Last Update:    12-June-2014
+Affected:       OpenAFS file servers running version 1.6.8
+
+An attacker with the ability to connect to an OpenAFS fileserver
+over the network can trigger the use of uninitialized memory and,
+potentially, execution of arbitrary code with the privileges of
+the fileserver process.
+
+Clients are not affected.
+
+SUMMARY
+=======
+
+The 1.6.8 release of the OpenAFS fileserver and dafileserver
+processes introduced a security vulnerability in the host package
+due to the use of uninitialized memory allocations from the process
+heap.
+
+
+IMPACT
+======
+
+New client connections to the fileserver can result in unexpected
+termination of the service.  As a side-effect of service termination
+callback state information and data not yet flushed to disk can be
+lost.
+
+An attacker with the ability to connect to an OpenAFS fileserver over
+the network can trigger the use of uninitialized memory and,
+potentially,  execution of arbitrary code with the privileges of the
+fileserver process.
+
+
+AFFECTED SOFTWARE
+=================
+
+The fileserver and dafileserver executables in release 1.6.8 of OpenAFS
+only. Clients and database server processes are unaffected.
+
+
+FIXES
+=====
+
+The OpenAFS project recommends that administrators of fileservers upgrade
+to OpenAFS version 1.6.9 or newer.
+
+For those sites unable, or unwilling, to upgrade a patch which resolves this
+issue is available directly from:
+
+  http://www.openafs.org/security/openafs-sa-2014-002.patch
+
+The latest stable OpenAFS release is always available from
+http://www.openafs.org/release/latest.html
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+  http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+  http://www.openafs.org/
+
+
+ACKNOWLEDGEMENTS
+================
+
+This issue was reported by Andrew Deason.

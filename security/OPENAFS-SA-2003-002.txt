@@ -1,0 +1,120 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+		OpenAFS Security Advisory 2003-002
+
+Topic: Rx connection hijacking vulnerability in OpenAFS clients and servers
+
+Issued:		18-Apr-2003
+Last Update:	18-Apr-2003
+Affected:	OpenAFS 1.0 - 1.2.7, OpenAFS 1.3.0 - 1.3.2
+
+A remote user can hijack Rx connections between unpatched AFS clients and
+servers.  This allows the attacker to observe and modify the data stream,
+unless rxkad mode crypt ("fs setcrypt on") is used.
+
+SUMMARY
+=======
+
+There is a bug in the Rx RPC protocol, used by AFS, which can be exploited
+by an attacker to hijack arbitrary Rx connections.  This allows the
+attacker to mount a denial of service attack by breaking arbitrary Rx
+connections.  Additionally, unless encryption is used, such as rxkad mode
+crypt ("fs setcrypt on") and the user accessing files is authenticated
+(has valid tokens), the attacker can observe and modify the data being
+transferred.
+
+The AFS cache manager and other AFS administrative clients (such as pts,
+fs, vos, etc) are vulnerable to these attacks.  Vulnerable AFS servers
+allow connections from AFS cache managers to be hijacked, but not
+connections from the other AFS administrative clients (such as pts, fs,
+vos, etc).
+
+There are no known publicly-available exploits for this vulnerability at
+this time.
+
+IMPACT
+======
+
+A remote attacker can cause communication failure between any AFS server
+and client, by hijacking the Rx connection between them. In cases when
+rxkad mode crypt is not turned on, or users are accessing AFS without
+tokens, a remote attacker can observe and modify the data being
+transferred.  This allows the attacker to read and modify the contents of
+any files accessible to users of vulnerable AFS clients.
+
+If executable files are ran from AFS on a vulnerable client, the attacker
+can inject malicious code of his choice, possibly causing a compromise of
+the client machine.  The attacker can also inject data to make an
+executable file in AFS appear to be setuid root to the client, causing
+their code to execute as root.
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS 1.0.x and 1.1.x.
+All releases of OpenAFS 1.2.x, up to and including OpenAFS 1.2.7.
+All releases of OpenAFS 1.3.x, up to and including OpenAFS 1.3.2.
+
+FIXES
+=====
+
+The OpenAFS project recommends that all users upgrade to OpenAFS version
+1.2.9 or newer.  Note that both clients and servers must be upgraded in
+order to fix this vulnerability.  The latest stable OpenAFS release is
+always available from http://www.openafs.org/release/latest.html.
+
+No update is presently available for the OpenAFS-unstable series.
+
+For those who are unable to upgrade, apply the patch referenced below to
+correct the Rx hijacking vulnerability, and rebuild your tree.
+
+This patch may be found at:
+
+    http://www.openafs.org/security/openafs-sa-2003-002.patch
+
+The associated detached PGP signature is at:
+
+    http://www.openafs.org/security/openafs-sa-2003-002.patch.asc
+
+It was generated against OpenAFS 1.2.7, but should apply to earlier
+releases, possibly with some offset.
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+    http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+    http://www.openafs.org/
+
+ACKNOWLEDGEMENTS
+================
+
+Thanks to Jeffrey Hutzelman <jhutz@cs.cmu.edu> for his help in analyzing
+and fixing this vulnerability.
+
+DETAIL
+======
+
+The Rx RPC protocol, used by AFS to communicate between clients and
+servers, supports multi-homed hosts by, in some cases, re-routing Rx
+connections to new IP addresses.  This feature can be exploited by an
+attacker to re-route arbitrary Rx connections to a host of their choice,
+by sending a special Rx packet that causes the recipient to believe that
+the peer has changed its IP address.
+
+The Rx protocol will allow connections to be re-routed in all cases except
+for connections from administrative AFS clients, such as pts or vos, on
+the server.  That is, the server will not re-route such an Rx connection
+(although the client will).  This means the attacker can only observe or
+modify the traffic sent by the client to the server, in such a scenario.
+
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.2.1 (SunOS)
+
+iD4DBQE+oFkPlrhgrDZcUhURAkydAJdsY2AfRNPVV0GGvpVdXFQUpPmZAJ9h9p6U
+dv7M/ivxdEguyfP5QBcqnw==
+=eVKa
+-----END PGP SIGNATURE-----

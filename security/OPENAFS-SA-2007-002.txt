@@ -1,0 +1,95 @@
+		OpenAFS Security Advisory 2007-002
+
+Topic: Denial of Service Vulnerability in OpenAFS for Windows clients
+
+Issued:		19-Apr-2007
+Last Update:	19-Apr-2007
+Affected:	OpenAFS 1.3.64 - 1.3.99, 1.4.0 - 1.4.4, 1.5.0 - 1.5.18
+                when MIT Kerberos for Windows (any version) is installed
+
+A user with the ability to alter the contents of the default 
+Kerberos v5 configuration profile can prevent Microsoft Windows from 
+successfully booting.
+
+SUMMARY
+=======
+
+OpenAFS for Windows installs a Network Provider module, afslogon.dll, which
+is loaded by the Windows Logon service, winlogon.exe.  When MIT Kerberos for
+Windows is installed, afslogon.dll will attempt to perform operations that
+involve the Kerberos v5 libraries.  Successful use of Kerberos v5 requires 
+the ability to establish a krb5_context.  Parsing errors in the Kerberos v5
+configuration profile, krb5.ini, will prevent the successful creation of a 
+krb5_context.  afslogon.dll attempts to free a krb5_context whether or 
+not it was successfully established.  This produces a memory access error that 
+in turn forces the Windows Logon Service to terminate unexpectedly and causes
+Microsoft Windows to halt.
+
+There are no known publicly-available exploits for this vulnerability at
+this time.
+
+IMPACT
+======
+
+An attacker (or misguided user) by damaging the contents of the Kerberos v5
+configuration profile can prevent Microsoft Windows 2000, XP, 2003, and Vista
+from successfully booting even in safe mode.  Booting from CD and 
+replacing the Kerberos v5 configuration profile is required to correct the 
+condition.
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS for Windows 1.3.64 and above.
+All releases of OpenAFS for Windows 1.4.x, up to and including OpenAFS 1.4.4.
+All releases of OpenAFS for Windows 1.5.x, up to and including OpenAFS 1.5.18.
+
+OpenAFS for non-Windows platforms are unaffected.
+
+FIXES
+=====
+
+The OpenAFS project recommends that users with versions of OpenAFS for
+Windows older than 1.5.19 upgrade to 1.5.19 or above.
+
+The latest OpenAFS for Windows release is always available from 
+http://www.openafs.org/windows.html.
+
+For those who are unable to upgrade, removal of afslogon.dll from the 
+%WinDir%\System32 directory can be used as a workaround.  The side effects
+of doing so include no support for integrated logon and the possibility
+that users will be able to logon prior to the AFS client service reaching
+a ready state.
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+    http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+    http://www.openafs.org/
+
+DETAIL
+======
+OpenAFS for Windows builds a static library, afskfw.lib, which includes all 
+of the logic for obtaining AFS tokens from arbitrary Kerberos v5 identities,
+managing Kerberos v5 ticket caches and Kerberos v5 ticket renewals.  Within
+this library are two locations in which krb5_free_context() can be called 
+with a NULL pointer.  The MIT Kerberos libraries do not validate the input 
+parameter and proceed to use the data pointed to by the NULL pointer as a 
+valid krb5_context.  krb5_free_context() proceeds to free memory for data 
+structures referred to by the krb5_context and generates an invalid memory
+access exception.  
+
+afskfw.lib is linked into afscreds.exe, afssrvmgr.exe, and afslogon.dll.  
+An invalid Kerberos v5 configuration profile with damage to either the 
+[libdefaults] or [realms] sections (and perhaps others) will prevent the
+generation of a krb5_context from krb5_init_context().  
+
+The afslogon.dll Network Provider module is loaded by the Windows Logon 
+Service regardless of whether or not integrated logon is in use.  A failure
+to create a valid krb5_context will result in process termination.  The
+failure of the Windows Logon Service process forces Microsoft Windows to 
+halt, producing a blue screen.
+

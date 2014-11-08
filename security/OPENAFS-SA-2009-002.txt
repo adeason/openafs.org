@@ -1,0 +1,89 @@
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+                      OpenAFS Security Advisory 2009-002                       
+                                CVE-2009-1250
+
+Topic: Denial of service attack against Linux cache manager
+
+Issued:		06-Apr-2009
+Last Update:    06-Apr-2009
+Affected:	Linux OpenAFS clients
+		running versions 1.0 thru 1.4.8 & 1.5.0 thru 1.5.58
+
+An attacker with control of a fileserver, or the ability to forge RX packets,
+can crash the cache manager, and hence the kernel, of affected Linux AFS
+clients.
+
+SUMMARY
+=======
+
+AFS may pass an error code obtained from the fileserver directly to the
+Linux kernel, using a Linux mechanism that merges error codes and pointers 
+into a single value. However, this mechanism is unable to distinguish certain
+error codes from pointers. When AFS returns a code of this type to the kernel,
+the kernel treats it as a pointer and attempts to dereference it. This causes a
+kernel panic, and results in a denial of service attack.
+
+IMPACT
+======
+
+By forging responses from an existing fileserver, or by getting a user to
+visit a fileserver under their control, an attacker may crash the client
+under attack.
+
+No publicly available exploits are currently known.
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS up to (and including) 1.4.8
+All releases of OpenAFS 1.5.0 to 1.5.58
+
+Only the Linux cache manager is affected.
+
+FIXES
+=====
+
+The OpenAFS project recommends that administrators with Linux clients 
+upgrade to OpenAFS version 1.4.9 or newer, or as appropriate for people 
+testing features in the OpenAFS 1.5 series, OpenAFS version 1.5.59 or newer. 
+Only Linux clients need to be upgraded.
+
+For those sites unable, or unwilling, to upgrade a patch which resolves this
+issue is available as
+    STABLE14-linux-avoid-returning-invalid-pointers-on-error-20090402 
+in the OpenAFS delta system, or directly from 
+    http://www.openafs.org/security/openafs-sa-2009-002.patch
+The corresponding PGP signature is available from
+    http://www.openafs.org/security/openafs-sa-2009-002.sig
+
+Note that this patch is against 1.4.8, although it may apply to earlier 
+releases. Patches for 1.5 and HEAD are available from wdelta, or in CVS.
+
+The latest stable OpenAFS release is always available from 
+http://www.openafs.org/release/latest.html
+
+This announcement and code patches related to it may be found on the
+OpenAFS security advisory page at:
+
+    http://www.openafs.org/security/
+
+The main OpenAFS web page is at:
+
+    http://www.openafs.org/
+
+
+ACKNOWLEDGEMENTS
+================
+
+This issue was identified by Simon Wilkinson, from an original bug report by 
+Toby Blake. Derrick Brashear provided the final version of the patch that is 
+distributed with this advisory.
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.8 (Darwin)
+
+iEYEARECAAYFAknafiIACgkQfL7q67hBYxVJHQCgr+JsyA8RHFvNXEGTcDcrqbAg
+VQgAoI/258UV/lM3XZGkJK2Q/Fm+MS0R
+=0OFD
+-----END PGP SIGNATURE-----

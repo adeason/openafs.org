@@ -1,0 +1,123 @@
+OpenAFS Security Advisory 2013-003
+
+Topic: Brute force DES attack permits compromise of AFS cell
+       CVE-2013-4134
+
+Issued:
+Last Updated:
+Affected: OpenAFS servers before 1.6.5 / 1.4.15
+
+The small size of the DES key space permits an attacker to brute
+force a cell's service key and then forge traffic from any user
+within the cell. The key space search can be performed in under 1
+day at a cost of around $100 using publicly available services.
+
+SUMMARY
+=======
+
+OpenAFS uses Kerberos tickets to secure network traffic. For historical
+reasons, it has only supported the DES encryption algorithm to encrypt
+these tickets. The weakness of DES's 56 bit key space has long been
+known, however it has recently become possible to use that weakness 
+to cheaply (around $100) and rapidly (approximately 23 hours) compromise
+a service's long term key.
+
+An attacker must first obtain a ticket for the cell. They may then use
+a brute force attack to compromise the cell's private service key.
+Once an attacker has gained access to the service key, they can use this
+to impersonate any user within the cell, including the super user, giving
+them access to all administrative capabilities as well as all user data.
+
+Recovering the service key from a DES encrypted ticket is an issue
+for any Kerberos service still using DES (and especially so for realms which
+still have DES keys on their ticket granting ticket). The MIT Kerberos 
+Consortium is aware of this issue, and have produced a general guide
+for sites wishing to migrate away from DES which is referenced below.
+
+This vulnerability is a particular problem for OpenAFS because DES is the only
+encryption algorithm supported in current releases.
+
+IMPACT
+======
+
+An attacker may gain complete control over the targeted cell.
+
+No publicly available exploits are currently known.
+
+AFFECTED SOFTWARE
+=================
+
+All current releases of OpenAFS. This is all releases prior to 1.4.15, all 
+releases in the 1.6 series prior to 1.6.5 and all releases in the 1.7 series
+prior to 1.7.26.
+
+FIXES
+=====
+
+The OpenAFS project recommends that administrators upgrade to OpenAFS 1.6.5
+or later.  For those sites unable, or unwilling, to upgrade to the 1.6 series, 
+a final release in the 1.4 series, 1.4.15, is provided.
+
+In addition to upgrading, some additional cell configuration is required. New
+encryption types must be added to the afs@REALM or afs/cell@REALM principal in
+the KDC, and extracted to a new file (rxkad.keytab) on each OpenAFS file or
+database server. Links to more detailed upgrade documentation are given below.
+
+For sites running with kaserver, there is no fix, since kaserver still
+only supports single DES. Sites running kaserver must migrate to a
+Kerberos 5 environment in addition to applying the fixes in this alert,
+in order to fix this issue.
+
+DETAILS
+=======
+
+These patches extend the rxkad security class with two modifications. The first,
+rxkad-k5, adds support for non-DES service keys. The first modification is
+sufficient to fix the immediate vulnerability. The software update must be 
+deployed on all OpenAFS database and file servers within a cell, 
+additional encryption types added to the cell's afs/cell@REALM or 
+afs@REALM principal, and extracted to the rxkad.keytab file on each server. 
+This modification requires that all OpenAFS servers are built with Kerberos
+support, and that all server machines have Kerberos libraries installed.
+
+With the first change applied, DES is still used for the Kerberos session key 
+shared between client and server and, as such, DES must still be enabled in 
+the realm's KDC.
+
+In order to disable DES entirely a second change is required. This
+modification, rxkad-kdf, permits the use of non-DES Kerberos session keys and
+removes the dependency on DES in the KDC. Unfortunately, this modification
+requires changes to the OpenAFS client software on every machine that
+makes authenticated connections to the cell. Once DES support is removed in
+the KDC, only updated clients will be able to connect.
+
+Note that the client modifications to accommodate rxkad-kdf do not
+require a restart of the OpenAFS client in order to take effect. The
+modifications only affect the userspace tools used to acquire tokens.
+
+To summarise: The immediate security issue may be resolved by a server upgrade and
+configuration change. Sites who wish to turn off DES entirely in their KDCs must
+also upgrade all of their clients.
+
+FURTHER READING
+===============
+
+Detailed documentation about how to deploy these changes is available from
+http://www.openafs.org/
+
+The MIT Kerberos Consortium provides the following documentation on moving
+other services away from DES:
+http://web.mit.edu/kerberos/krb5-latest/doc/admin/advanced/retiring-des.html
+
+ACKNOWLEDGEMENTS
+================
+
+This issue was identified by Alex Chernyakhovsky, Christy Dennison, 
+Patrick Hurst and Peter Iannucci as part of the MIT Computer Systems Security 
+course.
+
+These patches were developed by Derrick Brashear, Alexander Chernyakhovsky,
+Andrew Deason, Chaskiel M Grundman and Benjamin Kaduk, with advice from 
+Mitch Berger, Adam Glasgall, Jeffrey Hutzelman, Tom Yu and Nickolai
+Zeldovich.
+

@@ -1,0 +1,24 @@
+commit 5f5b02a57102af1a85fb9bdaaec31b6094d0c9c4
+Author: Michael Meffie <mmeffie@sinenomine.net>
+Date:   Wed Jul 17 23:10:42 2013 +0100
+
+    ubik: Fix encryption selection in ugen
+    
+    Make sure that we encrypt when requested to by the application
+    
+    Change-Id: If4c2ba2257bf060d3e9169ccdbcae54f54dfe5d7
+
+diff --git a/src/ubik/uinit.c b/src/ubik/uinit.c
+index 41a63f5..ba1ed7a 100644
+--- a/src/ubik/uinit.c
++++ b/src/ubik/uinit.c
+@@ -80,6 +80,9 @@ ugen_ClientInit(int noAuthFlag, const char *confDir, char *cellName, afs_int32 s
+ 	secFlags |= AFSCONF_SECOPTS_NOAUTH;
+     }
+ 
++    if (gen_rxkad_level == rxkad_crypt)
++	secFlags |= AFSCONF_SECOPTS_ALWAYSENCRYPT;
++
+     tdir = afsconf_Open(confdir);
+     if (!tdir) {
+ 	fprintf(stderr,

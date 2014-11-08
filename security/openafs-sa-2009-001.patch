@@ -1,0 +1,82 @@
+Index: src/afs/VNOPS/afs_vnop_lookup.c
+===================================================================
+--- src/afs/VNOPS/afs_vnop_lookup.c	2009-04-01 17:01:49.000000000 +0100
++++ src/afs/VNOPS/afs_vnop_lookup.c	2009-04-01 17:01:58.000000000 +0100
+@@ -538,8 +538,6 @@
+     int nskip;			/* # of slots in the LRU queue to skip */
+     struct vcache *lruvcp;	/* vcache ptr of our goal pos in LRU queue */
+     struct dcache *dcp;		/* chunk containing the dir block */
+-    char *statMemp;		/* status memory block */
+-    char *cbfMemp;		/* callback and fid memory block */
+     afs_size_t temp;		/* temp for holding chunk length, &c. */
+     struct AFSFid *fidsp;	/* file IDs were collecting */
+     struct AFSCallBack *cbsp;	/* call back pointers */
+@@ -597,13 +595,11 @@
+      * one for fids and callbacks, and one for stat info.  Well set
+      * up our pointers to the memory from there, too.
+      */
+-    statMemp = osi_AllocLargeSpace(nentries * sizeof(AFSFetchStatus));
+-    statsp = (struct AFSFetchStatus *)statMemp;
+-    cbfMemp =
+-	osi_AllocLargeSpace(nentries *
+-			    (sizeof(AFSCallBack) + sizeof(AFSFid)));
+-    fidsp = (AFSFid *) cbfMemp;
+-    cbsp = (AFSCallBack *) (cbfMemp + nentries * sizeof(AFSFid));
++    statsp = (AFSFetchStatus *) 
++	    osi_Alloc(AFSCBMAX * sizeof(AFSFetchStatus));
++    fidsp = (AFSFid *) osi_AllocLargeSpace(nentries * sizeof(AFSFid));
++    cbsp = (AFSCallBack *) 
++	    osi_Alloc(AFSCBMAX * sizeof(AFSCallBack));
+ 
+     /* next, we must iterate over the directory, starting from the specified
+      * cookie offset (dirCookie), and counting out nentries file entries.
+@@ -1091,8 +1087,9 @@
+ 	code = 0;
+     }
+   done2:
+-    osi_FreeLargeSpace(statMemp);
+-    osi_FreeLargeSpace(cbfMemp);
++    osi_FreeLargeSpace((char *)fidsp);
++    osi_Free((char *)statsp, AFSCBMAX * sizeof(AFSFetchStatus));
++    osi_Free((char *)cbsp, AFSCBMAX * sizeof(AFSCallBack));
+     return code;
+ }
+ 
+Index: src/sys/rmtsysc.c
+===================================================================
+--- src/sys/rmtsysc.c	2009-03-23 12:39:25.000000000 +0000
++++ src/sys/rmtsysc.c	2009-04-01 17:17:16.000000000 +0100
+@@ -241,8 +241,14 @@
+     InData.rmtbulk_len = data->in_size;
+     InData.rmtbulk_val = inbuffer;
+     inparam_conversion(cmd, InData.rmtbulk_val, 0);
+-    OutData.rmtbulk_len = data->out_size;
+-    OutData.rmtbulk_val = data->out;
++
++    OutData.rmtbulk_len = MAXBUFFERLEN * sizeof(*OutData.rmtbulk_val);
++    OutData.rmtbulk_val = malloc(OutData.rmtbulk_len); 
++    if (!OutData.rmtbulk_val) {
++	free(inbuffer);
++	return -1;
++    }
++
+     /* We always need to pass absolute pathnames to the remote pioctl since we
+      * lose the current directory value when doing an rpc call. Below we
+      * prepend the current absolute path directory, if the name is relative */
+@@ -279,8 +285,15 @@
+     if (!errorcode) {
+ 	/* Do the conversions back to the host order; store the results back
+ 	 * on the same buffer */
+-	outparam_conversion(cmd, OutData.rmtbulk_val, 1);
++	if (data->out_size < OutData.rmtbulk_len) {
++	    errno = EINVAL;
++	    errorcode = -1;
++	} else {
++	    memcpy(data->out, OutData.rmtbulk_val, data->out_size);
++	    outparam_conversion(cmd, data->out, 1);
++	}
+     }
++    free(OutData.rmtbulk_val);
+     free(inbuffer);
+     return errorcode;
+ }

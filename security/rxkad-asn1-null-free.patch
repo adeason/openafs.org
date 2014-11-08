@@ -1,0 +1,105 @@
+From d91d05a2cb9607eaf8f0b0d98db48ebe387ec70e Mon Sep 17 00:00:00 2001
+From: Andrew Deason <adeason@sinenomine.net>
+Date: Wed, 30 Jun 2010 13:05:26 -0500
+Subject: [PATCH] rxkad: NULL pointers on free
+
+The rxkad ASN.1 decoding routines assume that you can free ASN.1
+objects more than once. So NULL out items when they are free, so when
+they are freed again nothing happens (instead of aborting from a
+double-free).
+
+Change-Id: I87a431baaa7ff958552fe9d5cfa29b78c8aca6f0
+---
+ src/rxkad/v5der.c |    3 +++
+ src/rxkad/v5gen.c |    8 ++++++++
+ 2 files changed, 11 insertions(+), 0 deletions(-)
+
+diff --git a/src/rxkad/v5der.c b/src/rxkad/v5der.c
+index 7b7e67b..e8d7cca 100644
+--- a/src/rxkad/v5der.c
++++ b/src/rxkad/v5der.c
+@@ -972,18 +972,21 @@ void
+ free_general_string(general_string * str)
+ {
+     free(*str);
++    *str = NULL;
+ }
+ 
+ void
+ free_octet_string(octet_string * k)
+ {
+     free(k->data);
++    k->data = NULL;
+ }
+ 
+ void
+ free_oid(oid * k)
+ {
+     free(k->components);
++    k->components = NULL;
+ }
+ 
+ /*
+diff --git a/src/rxkad/v5gen.c b/src/rxkad/v5gen.c
+index b6087c4..624580f 100644
+--- a/src/rxkad/v5gen.c
++++ b/src/rxkad/v5gen.c
+@@ -466,6 +466,7 @@ free_EncryptedData(EncryptedData * data)
+     free_ENCTYPE(&(data)->etype);
+     if ((data)->kvno) {
+ 	free((data)->kvno);
++	(data)->kvno = NULL;
+     }
+     free_octet_string(&(data)->cipher);
+ }
+@@ -694,6 +695,7 @@ free_PrincipalName(PrincipalName * data)
+ 	(&(data)->name_string)->len--;
+     }
+     free((&(data)->name_string)->val);
++    (&(data)->name_string)->val = NULL;
+ }
+ 
+ size_t
+@@ -829,6 +831,7 @@ free_HostAddresses(HostAddresses * data)
+ 	(data)->len--;
+     }
+     free((data)->val);
++    (data)->val = NULL;
+ }
+ 
+ size_t
+@@ -1211,6 +1214,7 @@ free_AuthorizationData(AuthorizationData * data)
+ 	(data)->len--;
+     }
+     free((data)->val);
++    (data)->val = NULL;
+ }
+ 
+ size_t
+@@ -1794,19 +1798,23 @@ free_EncTicketPart(EncTicketPart * data)
+     if ((data)->starttime) {
+ 	free_KerberosTime((data)->starttime);
+ 	free((data)->starttime);
++	(data)->starttime = NULL;
+     }
+     free_KerberosTime(&(data)->endtime);
+     if ((data)->renew_till) {
+ 	free_KerberosTime((data)->renew_till);
+ 	free((data)->renew_till);
++	(data)->renew_till = NULL;
+     }
+     if ((data)->caddr) {
+ 	free_HostAddresses((data)->caddr);
+ 	free((data)->caddr);
++	(data)->caddr = NULL;
+     }
+     if ((data)->authorization_data) {
+ 	free_AuthorizationData((data)->authorization_data);
+ 	free((data)->authorization_data);
++	(data)->authorization_data = NULL;
+     }
+ }
+ 
+-- 
+1.7.0.4
+

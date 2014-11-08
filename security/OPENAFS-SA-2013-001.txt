@@ -1,0 +1,62 @@
+OpenAFS Security Advisory 2013-001
+
+Topic: Buffer overflows in OpenAFS fileserver
+       CVE-2013-1794
+
+Issued:		27 Feb 2013
+Last Updated:	27 Feb 2013
+Affected:	OpenAFS servers before version 1.6.2
+
+An attacker with the ability to manipulate AFS directory ACLs may crash the
+fileserver hosting that volume. In addition, once a corrupt ACL is placed
+on a fileserver, its existence may crash client utilities manipulating ACLs
+on that server.
+
+SUMMARY
+=======
+
+By carefully crafting an ACL entry an attacker may overflow fixed length 
+buffers within the OpenAFS fileserver, crashing the fileserver, and 
+potentially permitting the execution of arbitrary code. To perform the
+exploit, the attacker must already have permissions to create ACLs on the
+fileserver in question.
+
+Once such an ACL is present on a fileserver, client utilities such as 'fs'
+which manipulate ACLs, may be crashed when they attempt to read or modify
+the ACL.
+
+IMPACT
+======
+
+An authenticated attacker may crash, or run arbitrary code, on an OpenAFS 
+fileserver, or a client connected to such a serever
+
+AFFECTED SOFTWARE
+=================
+
+All releases of OpenAFS prior to 1.6.2
+
+FIXES
+=====
+
+The OpenAFS project recommends that administrators upgrade to OpenAFS
+1.6.2 or later.
+
+For those sites unable, or unwilling, to upgrade a patch which resolves
+this issue is included below. This patch should apply to both OpenAFS
+1.6.1 and OpenAFS 1.4.14
+
+The latest stable OpenAFS release is always available from
+http://www.openafs.org/release/latest.html
+
+This announcement, and code patches related to it, may be found on the
+OpenAFS security advisory page at
+
+    http://www.openafs.org/security/
+
+ACKNOWLEDGEMENTS
+================
+
+This issue was identified, and the fix provided, by Nickolai Zeldovich
+
+

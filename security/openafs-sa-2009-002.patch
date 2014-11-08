@@ -1,0 +1,58 @@
+Index: src/afs/LINUX/osi_vnodeops.c
+===================================================================
+RCS file: /cvs/openafs/src/afs/LINUX/osi_vnodeops.c,v
+retrieving revision 1.81.2.77
+diff -u -r1.81.2.77 osi_vnodeops.c
+--- src/afs/LINUX/osi_vnodeops.c	19 Mar 2009 04:54:50 -0000	1.81.2.77
++++ src/afs/LINUX/osi_vnodeops.c	1 Apr 2009 19:12:50 -0000
+@@ -45,6 +45,10 @@
+ #define pageoff(pp) pp->offset
+ #endif
+ 
++#ifndef MAX_ERRNO
++#define MAX_ERRNO 1000L
++#endif
++
+ #if defined(AFS_LINUX26_ENV)
+ #define UnlockPage(pp) unlock_page(pp)
+ extern struct backing_dev_info afs_backing_dev_info;
+@@ -1087,8 +1087,10 @@
+ #if LINUX_VERSION_CODE >= KERNEL_VERSION(2,2,10)
+     if (code == ENOENT)
+ 	return ERR_PTR(0);
+-    else
++    else if ((code >= 0) && (code <= MAX_ERRNO))
+ 	return ERR_PTR(-code);
++    else 
++	return ERR_PTR(-EIO);
+ #else
+     if (code == ENOENT)
+ 	code = 0;
+@@ -1429,7 +1431,10 @@
+ 
+     if (code < 0) {
+ 	dput(basep);
+-	res = ERR_PTR(code);
++	if (code < -MAX_ERRNO)
++	    res = ERR_PTR(-EIO);
++	else
++	    res = ERR_PTR(code);
+     } else {
+ 	name[code] = '\0';
+ 	res = lookup_dentry(name, basep, follow);
+Index: src/afs/VNOPS/afs_vnop_lookup.c
+===================================================================
+RCS file: /cvs/openafs/src/afs/VNOPS/afs_vnop_lookup.c,v
+retrieving revision 1.50.2.22
+diff -u -r1.50.2.22 afs_vnop_lookup.c
+--- src/afs/VNOPS/afs_vnop_lookup.c	26 Aug 2008 14:02:14 -0000	1.50.2.22
++++ src/afs/VNOPS/afs_vnop_lookup.c	1 Apr 2009 19:12:51 -0000
+@@ -1081,7 +1081,7 @@
+ 	afs_PutVolume(volp, READ_LOCK);
+ 
+     /* If we did the InlineBulk RPC pull out the return code */
+-    if (inlinebulk) {
++    if (inlinebulk && code == 0) {
+ 	if ((&statsp[0])->errorCode) {
+ 	    afs_Analyze(tcp, (&statsp[0])->errorCode, &adp->fid, areqp,
+ 			AFS_STATS_FS_RPCIDX_BULKSTATUS, SHARED_LOCK, NULL);
