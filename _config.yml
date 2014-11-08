@@ -3,6 +3,10 @@
 # Disable custom plugins (this is how "Github pages" runs)
 safe: true
 
+# Number of news items listed per page.
+paginate: 5
+paginate_path: "news/page:num"
+
 defaults:
   # For all pages, default to the 'page' layout
   - scope:
