@@ -13,5 +13,5 @@ forge RX packets, can crash the cache manager, and hence the kernel, of
 affected Linux AFS clients. This vulnerability is being tracked as
 CVE-2009-1250.
 
--   [Go to the advisory](/security/OPENAFS-SA-2009-002.txt)
+-   [Go to the advisory](/security/OPENAFS-SA-2009-002.html)
 

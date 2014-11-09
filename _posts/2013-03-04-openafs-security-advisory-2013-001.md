@@ -14,5 +14,5 @@ placed on a fileserver, its existence may crash client utilities
 manipulating ACLs on that server. This vulnerability is being tracked as
 CVE-2013-1794.
 
--   [Go to the advisory](/security/OPENAFS-SA-2013-001.txt)
+-   [Go to the advisory](/security/OPENAFS-SA-2013-001.html)
 

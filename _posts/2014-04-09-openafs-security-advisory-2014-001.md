@@ -13,5 +13,5 @@ of 1.6.8 will not be affected.) An attacker with the ability to connect
 to an OpenAFS fileserver can trigger a buffer overflow, crashing the
 server. This vulnerability is being tracked as CVE-2014-0159.
 
--   [Go to the advisory](/security/OPENAFS-SA-2014-001.txt)
+-   [Go to the advisory](/security/OPENAFS-SA-2014-001.html)
 

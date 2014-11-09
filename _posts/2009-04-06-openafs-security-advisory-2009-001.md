@@ -14,5 +14,5 @@ the kernel, of any Unix AFS client. It may be possible for an attacker
 to cause the kernel to execute arbitrary code. This vulnerability is
 being tracked as CVE-2009-1251.
 
--   [Go to the advisory](/security/OPENAFS-SA-2009-001.txt)
+-   [Go to the advisory](/security/OPENAFS-SA-2009-001.html)
 

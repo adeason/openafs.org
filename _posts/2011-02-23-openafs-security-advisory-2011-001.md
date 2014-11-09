@@ -13,5 +13,5 @@ forge RX packets, can crash a server of affected hosts. This
 vulnerability is being tracked as CVE-2011-0430. Currently the advisory
 erroneously states 1.4.14 is vulnerable.
 
--   [Go to the advisory](/security/OPENAFS-SA-2011-001.txt)
+-   [Go to the advisory](/security/OPENAFS-SA-2011-001.html)
 

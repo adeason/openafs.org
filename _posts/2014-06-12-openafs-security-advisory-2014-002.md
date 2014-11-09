@@ -12,5 +12,5 @@ releases are not affected. An attacker with the ability to connect to an
 OpenAFS fileserver can trigger the use of uninitialized memory, crashing
 the server. This vulnerability is being tracked as CVE-2014-4044.
 
--   [Go to the advisory](/security/OPENAFS-SA-2014-002.txt)
+-   [Go to the advisory](/security/OPENAFS-SA-2014-002.html)
 
