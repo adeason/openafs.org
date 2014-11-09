@@ -1,7 +1,9 @@
 ---
 title: OpenAFS Security Advisory 2009-002
 layout: page
-category: news
+category: security
+advisory: 2009-002
+cve: CVE-2009-1250
 ---
 
 #### 2009-04-06 - OpenAFS Security Advisory 2009-002

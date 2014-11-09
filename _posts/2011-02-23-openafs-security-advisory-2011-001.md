@@ -1,7 +1,9 @@
 ---
 title: OpenAFS Security Advisory 2011-001
 layout: page
-category: news
+category: security
+advisory: 2011-001
+cve: CVE-2011-0430
 ---
 
 #### 2011-02-23 - OpenAFS Security Advisory 2011-001

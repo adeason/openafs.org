@@ -1,0 +1,14 @@
+---
+title: Security Advisories
+layout: page
+---
+
+{% for post in site.categories.security %}
+  <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
+  <p class="author">
+    <span class="date">{{ post.date | date_to_string }}</span>
+  </p>
+  <div class="content">
+    {{ post.content }}
+  </div>
+{% endfor %}

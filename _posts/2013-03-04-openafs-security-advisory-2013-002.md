@@ -1,7 +1,9 @@
 ---
 title: OpenAFS Security Advisory 2013-002
 layout: page
-category: news
+category: security
+advisory: 2013-002
+cve: CVE-2013-1795
 ---
 
 #### 2013-03-04 - OpenAFS Security Advisory 2013-002

@@ -29,9 +29,9 @@ extra-css: ["splash.css"]
 <div id="front-ticker">
   <div id="ticker-news">
     <h2>Latest News</h2>
-    {% for post in site.posts limit:3 %}
+    {% for post in site.categories.news limit:3 %}
       <div class="ticker-item">
-         <h4>{{  post.date | date_to_string }} - <a href="{{ post.url }}">{{ post.title }}</a></h4>
+        <h4>{{ post.date | date_to_string }} - <a href="{{ post.url }}">{{ post.title }}</a></h4>
       </div>
     {% endfor %}
     <div class="ticker-item">
@@ -43,13 +43,13 @@ extra-css: ["splash.css"]
 
   <div id="ticker-security">
     <h2>Security Advisories</h2>
-    {% for item in site.data.splash.security %}
+    {% for post in site.categories.security limit:3 %}
       <div class="ticker-item">
-        <h4>{{ item.date }} - <a href="security/{{ item.page }}">{{ item.title }}</a></h4>
+        <h4>{{ post.date | date_to_string }} - <a href="{{ post.url }}">{{ post.title }}</a></h4>
       </div>
     {% endfor %}
     <div class="ticker-item">
-      <a href="XXXbrokenlink">More Security Advisories »</a>
+      <a href="/security/">More Security Advisories »</a>
     </div>
   </div>
 </div>

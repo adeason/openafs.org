@@ -1,7 +1,9 @@
 ---
 title: OpenAFS Security Advisory 2014-001
 layout: page
-category: news
+category: security
+advisory: 2014-001
+cve: CVE-2014-0159
 ---
 
 #### 2014-04-09 - OpenAFS Security Advisory 2014-001

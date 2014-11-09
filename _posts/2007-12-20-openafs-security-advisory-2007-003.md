@@ -1,7 +1,8 @@
 ---
 title: OpenAFS Security Advisory 2007-003
 layout: page
-category: news
+category: security
+advisory: 2007-003
 ---
 
 #### 2007-12-20 - OpenAFS Security Advisory 2007-003
