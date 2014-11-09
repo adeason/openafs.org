@@ -6,7 +6,6 @@ advisory: 2013-001
 cve: CVE-2013-1794
 ---
 
-#### 2013-03-04 - OpenAFS Security Advisory 2013-001
 
 OpenAFS servers versions before 1.6.2 for all platforms.   An attacker
 with the ability to manipulate AFS directory ACLs may crash the

@@ -1,8 +1,6 @@
 ---
-title: Documentation
+title: Documentation for OpenAFS
 ---
-
-## Documentation for OpenAFS ##
 
 You can find documentation for OpenAFS in the Release Notes, Guides, Reference manual, and the wiki.
 

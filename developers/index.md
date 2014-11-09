@@ -1,9 +1,7 @@
 ---
-title: Developers
+title: Developer Resources
 extra-css: ["developers.css"]
 ---
-
-## Developer Resources ##
 
 OpenAFS is open source software under the [IBM Public
 License](http://www.opensource.org/licenses/IPL-1.0).

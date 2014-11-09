@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2006-12-06 - pam-afs-session 1.0 released
 
 pam-afs-session is a PAM module intended for use with a Kerberos v5 PAM
 module to obtain an AFS PAG and AFS tokens on login. It puts every new

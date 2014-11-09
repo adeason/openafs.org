@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2008-03-17 - OpenAFS participating in Google Summer of Code
 
 Once again, Google will be doing their Summer of Code. For the first
 year, OpenAFS will be participating as a mentoring organization.

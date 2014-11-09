@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2009-07-09 - OpenAFS Changes Source Code Version Control System to Git
 
 After more than eighteen months of attempts to migrate source code
 management away from cvs OpenAFS has finally converted to Git. This

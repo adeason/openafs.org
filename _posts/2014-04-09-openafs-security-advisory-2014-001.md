@@ -6,7 +6,6 @@ advisory: 2014-001
 cve: CVE-2014-0159
 ---
 
-#### 2014-04-09 - OpenAFS Security Advisory 2014-001
 
 OpenAFS servers versions 1.4.8 through 1.6.6 for all platforms. (The
 first prerelease of 1.6.8, 1.6.8pre1 is also affected. The final release

@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2014-06-12 - OpenAFS 1.6.9 - Security release for UNIX/Linux fileservers
 
 OpenAFS 1.6.9 is the next in the current series of OpenAFS stable
 releases for UNIX/Linux systems. This release includes the fix for

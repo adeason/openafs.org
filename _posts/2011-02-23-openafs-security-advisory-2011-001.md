@@ -6,7 +6,6 @@ advisory: 2011-001
 cve: CVE-2011-0430
 ---
 
-#### 2011-02-23 - OpenAFS Security Advisory 2011-001
 
 OpenAFS servers versions 1.2.8 - 1.4.12.1, 1.5.0-1.5.74 for all
 platforms.   An attacker with control of a client, or the ability to

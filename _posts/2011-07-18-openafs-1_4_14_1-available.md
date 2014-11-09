@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2011-07-18 - OpenAFS 1.4.14.1 available
 
 OpenAFS 1.4.14.1 is a patch release for 1.4.14, containing only updates
 for 1.4.14 on Linux and Solaris. No changes are included for other

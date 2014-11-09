@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2014-01-24 - OpenAFS 1.6.6 - Maintenance release for UNIX/Linux
 
 OpenAFS 1.6.6 is the next in the current series of OpenAFS stable
 releases for UNIX/Linux systems. Significant changes on top of the fixes

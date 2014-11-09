@@ -6,7 +6,6 @@ advisory: 2013-002
 cve: CVE-2013-1795
 ---
 
-#### 2013-03-04 - OpenAFS Security Advisory 2013-002
 
 OpenAFS servers versions before 1.6.2 for all platforms.   An attacker
 who can send an IdToName RPC can crash a ptserver. This vulnerability is

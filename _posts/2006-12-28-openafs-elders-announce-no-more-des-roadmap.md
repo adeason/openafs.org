@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2006-12-28 - OpenAFS Elders announce "No More DES" roadmap
 
 AFSv3 was designed and implemented during the late 80s and early 90s
 when the state of the art in distributed computer authentication and

@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2013-07-24 - SECURITY RELEASES - OpenAFS 1.4.15, 1.6.5 and 1.7.26 available
 
 With the release of OpenAFS security advisories 2013-003 and 2013-004,
 we have released OpenAFS 1.6 and 1.7 versions with code to address the

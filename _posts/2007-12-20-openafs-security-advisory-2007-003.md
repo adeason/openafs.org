@@ -5,7 +5,6 @@ category: security
 advisory: 2007-003
 ---
 
-#### 2007-12-20 - OpenAFS Security Advisory 2007-003
 
 OpenAFS fileserver versions 1.3.50 - 1.4.5, 1.5.0 - 1.5.27.  
 Fileservers of affected versions can be crashed by a client-triggered

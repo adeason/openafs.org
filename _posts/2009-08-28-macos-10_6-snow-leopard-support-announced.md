@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2009-08-28 - MacOS 10.6 Snow Leopard support announced
 
 Concurrent with the release of MacOS 10.6, OpenAFS has released OpenAFS
 1.5.62 with 32 and 64 bit kernel and userspace support for Snow Leopard.

@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2012-04-25 - 2012 European AFS and Kerberos Conference & Call for Papers
 
 Announcing the 2012 European AFS and Kerberos Conference taking place at
 the University of Edinburgh School of Informatics from Tuesday 16th to

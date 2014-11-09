@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2009-08-28 - Data Loss in Pre-1.5.62 OpenAFS for Windows Releases
 
 Releases of OpenAFS for Windows prior 1.5.62 may fail to store data to
 file servers. There are two issues that are addressed in the 1.5.62

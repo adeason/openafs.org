@@ -3,8 +3,6 @@ title: Downloads
 layout: downloads
 ---
 
-## Downloads ##
-
 ### Binaries ###
 
 To download the latest stable release of OpenAFS, choose your platform:

@@ -56,6 +56,11 @@
         class="container normalpage"
       {% endif %}
     >
+      {% if page.title %}
+      <div id="pagetitle">
+        <h2>{{ page.title }}</h2>
+      </div>
+      {% endif %}
       {{ content }}
     </div>
   </div>

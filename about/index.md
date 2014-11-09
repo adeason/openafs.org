@@ -1,9 +1,7 @@
 ---
-title: About
+title: About OpenAFS
 extra-css: ["about.css"]
 ---
-
-## About OpenAFS ##
 
 AFS is a distributed filesystem that enables computers to efficiently share filesystem resources across both local area and wide area networks.
 

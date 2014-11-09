@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2014-05-21 - OpenAFS 1.6.8 - Maintenance release for UNIX/Linux
 
 OpenAFS 1.6.8 is the next in the current series of OpenAFS stable
 releases for UNIX/Linux systems. Significant changes on top of the

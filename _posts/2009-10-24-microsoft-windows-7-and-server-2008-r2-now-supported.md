@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2009-10-24 - Microsoft Windows 7 and Server 2008 R2 now supported
 
 The OpenAFS Elders are pleased to announce that with the release of
 [OpenAFS for Windows](http://www.openafs.org/windows.html) version

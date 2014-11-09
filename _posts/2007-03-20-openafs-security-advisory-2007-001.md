@@ -5,7 +5,6 @@ category: security
 advisory: 2007-001
 ---
 
-#### 2007-03-20 - OpenAFS Security Advisory 2007-001
 
 Unix clients in OpenAFS versions before 1.5.17 and 1.4.4 allow a
 potential privilege escalation via setuid functionality which can be

@@ -6,7 +6,6 @@ advisory: 2009-002
 cve: CVE-2009-1250
 ---
 
-#### 2009-04-06 - OpenAFS Security Advisory 2009-002
 
 OpenAFS clients versions 1.0-1.4.8, 1.5.0-1.5.58 for all Linux 2.4-2.6
 platforms.   An attacker with control of a fileserver, or the ability to

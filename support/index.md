@@ -1,8 +1,6 @@
 ---
-title: Support
+title: Support for OpenAFS
 ---
-
-## Support for OpenAFS ##
 
 OpenAFS users have a range of paid and community-based options for obtaining support.
 

@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2006-12-01 - Announcing OpenAFS "Works with Windows Vista"
 
 The OpenAFS Elders are pleased to announce that with the release of
 [OpenAFS for Windows](http://www.openafs.org/windows.html) version

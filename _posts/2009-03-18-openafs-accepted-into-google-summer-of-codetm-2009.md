@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2009-03-18 - OpenAFS Accepted into Google Summer of Code(TM) 2009
 
 Following last year's successful participation in GSoC 2008, OpenAFS has
 been accepted for a second straight year. Students and OpenAFS experts

@@ -1,8 +1,6 @@
 ---
-title: Community
+title: OpenAFS Community
 ---
-
-## OpenAFS Community ##
 
 OpenAFS has several locations for its online community.
 

@@ -4,7 +4,6 @@ layout: page
 category: news
 ---
 
-#### 2014-05-13 - OpenAFS 1.7.31 - Native File System client for Microsoft Windows
 
 OpenAFS 1.7.31 is the next a series of OpenAFS clients for the Microsoft
 Windows platform that is implemented as a native file system. 
