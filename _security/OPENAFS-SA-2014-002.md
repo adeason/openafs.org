@@ -1,5 +1,6 @@
 ---
 id: 2014-002
+cve: CVE 2014-4044
 title: Use of uninitialized memory in OpenAFS fileserver
 issued: 12-Jun-2014
 updated: 12-Jun-2014

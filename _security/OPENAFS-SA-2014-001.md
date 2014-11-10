@@ -1,5 +1,6 @@
 ---
 id: 2014-001
+cve: CVE-2014-0159
 title: Denial of service attack against OpenAFS fileserver processes
 issued: 9-Apr-2014
 updated: 9-Apr-2013

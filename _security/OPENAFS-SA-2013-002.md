@@ -1,5 +1,6 @@
 ---
 id: 2013-002
+cve: CVE-2013-1795
 title: Buffer overflow in OpenAFS ptserver
 issued: 27-Feb-2013
 updated: 27-Feb-2013

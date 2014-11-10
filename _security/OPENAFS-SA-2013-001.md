@@ -1,5 +1,6 @@
 ---
 id: 2013-001
+cve: CVE-2013-1794
 title: Buffer overflows in OpenAFS fileserver
 issued: 27-Feb-2013
 updated: 27-Feb-2013

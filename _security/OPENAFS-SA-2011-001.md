@@ -1,5 +1,6 @@
 ---
 id: 2011-001
+cve: CVE-2011-0430
 title:  Denial of service attack against Rx server processes
 issued: 23-Feb-2011
 updated: 23-Feb-2011

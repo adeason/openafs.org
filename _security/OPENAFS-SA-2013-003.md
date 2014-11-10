@@ -1,5 +1,6 @@
 ---
 id: 2013-003
+cve: CVE-2013-4134
 title: Brute force DES attack permits compromise of AFS cell
 issued: 24-Jul-2013
 updated: 24-Jul-2013

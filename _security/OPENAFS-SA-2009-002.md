@@ -1,5 +1,6 @@
 ---
 id: 2009-002
+cve: CVE-2009-1250
 title: Denial of service attack against Linux cache manager
 issued: 6-Apr-2009
 updated: 6-Apr-2009

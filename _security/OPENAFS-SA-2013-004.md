@@ -1,5 +1,6 @@
 ---
 id: 2013-004
+cve: CVE-2013-4135
 title: vos -encrypt doesn't encrypt connection data
 issued: 24-Jul-2013
 updated: 24-Jul-2013

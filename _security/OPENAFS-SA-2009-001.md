@@ -1,5 +1,6 @@
 ---
 id: 2009-001
+cve: CVE-2009-1251
 title: Network based buffer overflow attack against Unix cache manager
 issued: 6-Apr-2009
 updated: 6-Apr-2009
