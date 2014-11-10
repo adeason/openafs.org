@@ -14,9 +14,6 @@ The key space search can be performed in under 1 day at a cost of around
 \$100 using publicly available services.
 
 Instructions:
-
 * [How to rekey your cell](/security/how-to-rekey.txt)
 * [How to install rxkad k5 support for servers running OpenAFS 1.6](/security/install-rxkad-k5-1.6.txt)
 * [How to install rxkad k5 support for servers running OpenAFS 1.4](/security/install-rxkad-k5-1.4.txt)
-
-

@@ -7,6 +7,9 @@ severity: High
 affected: OpenAFS 1.0-1.2.5, OpenAFS 1.3.0-1.3.2
 patch: xdr-updates-20020731.delta
 sig: xdr-updates-20020731.delta.asc
+patches:
+  - patch: xdr-updates-20020731.delta
+    sig: xdr-updates-20020731.delta.asc
 ---
 
 There is an integer overflow bug in the SUNRPC-derived RPC library used

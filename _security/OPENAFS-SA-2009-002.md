@@ -18,6 +18,3 @@ denial of service attack.
 
 There are no known publicly-available exploits for this vulnerability at
 this time.
-
-
-

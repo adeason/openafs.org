@@ -20,7 +20,7 @@ defaults:
     values:
       layout: ~
 
- # Security advisories
+ # Security advisories default to the advisory layout.
   - scope:
        type: "security"
     values:
@@ -53,5 +53,6 @@ collections:
     output: true
   security:
     output: true
-    layout: advisory
+    # commented out for local sandbox testing.
+    # prefix: "http://www.openafs.org/security"
 

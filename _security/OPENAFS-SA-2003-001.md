@@ -5,8 +5,9 @@ issued: 25-Mar-2003
 updated: 25-Mar-2003
 severity: High
 affected: OpenAFS 1.0-1.2.8, OpenAFS 1.3.0-1.3.2
-patch: kaserver-disable-krb4-crossrealm-20030317.delta
-sig: kaserver-disable-krb4-crossrealm-20030317.delta.asc
+patches:
+  - patch: kaserver-disable-krb4-crossrealm-20030317.delta
+    sig: kaserver-disable-krb4-crossrealm-20030317.delta.asc
 ---
 
 A cryptographic weakness in version 4 of the Kerberos protocol allows an
@@ -24,5 +25,3 @@ arbitrary principal names, you are not exposed to this vulnerability.
 
 There are no known publicly-available exploits for this vulnerability at
 this time.
-
-

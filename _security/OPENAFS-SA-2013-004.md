@@ -6,10 +6,9 @@ issued: 24-Jul-2013
 updated: 24-Jul-2013
 severity: High
 affected: OpenAFS client versions 1.6.1 through 1.6.4
-patch: openafs-sa-2013-004.patch
+patches:
+  - patch: openafs-sa-2013-004.patch
 ---
 
 An attacker can read data which an administrator expected to remain
 private.
-
-

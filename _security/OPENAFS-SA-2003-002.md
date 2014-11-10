@@ -5,8 +5,9 @@ issued: 18-Apr-2003
 updated: 18-Apr-2003
 severity: Medium
 affected: OpenAFS 1.0-1.2.7, OpenAFS 1.3.0-1.3.2
-patch: openafs-sa-2003-002.patch
-sig: openafs-sa-2003-002.patch.asc
+patches:
+  - patch: openafs-sa-2003-002.patch
+    sig: openafs-sa-2003-002.patch.asc
 ---
 
 There is a bug in the Rx RPC protocol, used by AFS, which can be
@@ -25,4 +26,3 @@ vos, etc).
 
 There are no known publicly-available exploits for this vulnerability at
 this time.
-

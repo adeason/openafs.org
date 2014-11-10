@@ -19,5 +19,3 @@ for this issue, describes in its summary the release as broken. It is
 not. We recommend sites upgrade to 1.4.14; However, the impact of the
 issue is limited to a denial of service attack by a user with the
 ability to affect a lock of AFS though the client on a host.
-
-

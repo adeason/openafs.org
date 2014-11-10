@@ -18,5 +18,3 @@ modes are vulnerable to such attacks.
 
 There are no known publicly-available exploits for this vulnerability at
 this time.
-
-
