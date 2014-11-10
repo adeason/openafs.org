@@ -2,10 +2,13 @@
 layout: page
 ---
 
-<p>
-  <a href="/security/{{ page.title }}.txt">[Plain Text]</a>
-</p>
+{% include advisory_info.html advisory=page %}
+
+<div class="content">
+  {{ content }}
 
 <pre>
-{% include_relative {{ page.title }}.txt %}
+{% include_relative OPENAFS-SA-{{ page.id }}.txt %}
 </pre>
+
+</div>

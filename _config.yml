@@ -20,6 +20,12 @@ defaults:
     values:
       layout: ~
 
+ # Security advisories
+  - scope:
+       type: "security"
+    values:
+      layout: "advisory"
+
 # Below here, put data that's not processed by jekyll, but we can access in
 # templates etc via accessing 'site.*'.
 
@@ -45,3 +51,7 @@ navigation:
 collections:
   newsletter:
     output: true
+  security:
+    output: true
+    layout: advisory
+

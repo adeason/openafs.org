@@ -1,0 +1,27 @@
+{% comment %}
+OpenAFS Security Advisory information table
+
+This table is included at the top of every security advisory page and shown
+in the listing of security advisories.
+{% endcomment %}
+<table class="sainfo">
+  <tr><th align="left">Issued:</th><td>{{ include.advisory.issued }}</td></tr>
+{% if include.advisory.updated %}
+  <tr><th align="left">Last Update:</th><td>{{ include.advisory.updated }}</td></tr>
+{% endif %}
+{% if include.advisory.severity %}
+  <tr><th align="left">Severity:</th><td>{{ include.advisory.severity }}</td></tr>
+{% endif %}
+  <tr><th align="left">Affected:</th><td>{{ include.advisory.affected }}</td></tr>
+{% if include.advisory.patch %}
+  <tr><th align="left">Patch:</th><td>
+    <a href="{{ include.advisorypatch }}">http://www.openafs.org/security/{{ include.advisory.patch }}</a><br>
+  </td></tr>
+{% endif %}
+<tr><th align="left">Full Text:</th>
+  <td>
+    <a href="{{ include.advisory.url }}">{{ include.advisory.url }}</a>
+    [<a href="OPENAFS-SA-{{ include.advisory.id }}.txt">txt</a>]
+  </td>
+</tr>
+</table>

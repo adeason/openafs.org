@@ -1,14 +1,57 @@
 ---
-title: Security Advisories
+title: OpenAFS Security Advisories
 layout: page
 ---
 
-{% for post in site.categories.security %}
-  <h1><a href="{{ post.url }}">{{ post.title }}</a></h1>
-  <p class="author">
-    <span class="date">{{ post.date | date_to_string }}</span>
-  </p>
+<p>The following are overviews of security advisories issued by the
+OpenAFS Project regarding known security problems in OpenAFS and its
+components.  Each overview includes a summary of the problem, a link
+to the full text of the advisory.  When they are available, patches
+are also included.</p>
+
+At the end of this document is a <a href="#salist">table of all
+OpenAFS security advisories</a>.
+
+<p>If you want to report security problems or issues with OpenAFS,
+you may send mail to the OpenAFS security officer at
+<a href="mailto:security@openafs.org">security@openafs.org</a>.
+When sending sensitive information, we ask that you encrypt it
+with PGP.</p>
+
+
+{% for item in site.security reversed %}
+<div class="saitem">
+  <h2><a href="{{ item.url }}">OPENAFS-SA-{{ item.id }} - {{ item.title }}</a></h2>
+  {% include advisory_info.html advisory=item %}
   <div class="content">
-    {{ post.content }}
+    {{ item.content }}
   </div>
+</div>
 {% endfor %}
+
+<a name="salist"></a>
+<h2>Overview of all OpenAFS Security Advisories</h2>
+<table border=1>
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Issued</th>
+      <th>Updated</th>
+      <th>Severity</th>
+      <th>Versions Affected</th>
+      <th>topic</th>
+    </tr>
+  </thead>
+<tbody>
+{% for sa in site.security %}
+  <tr>
+    <td>{{ sa.id }}</td>
+    <td>{{ sa.issued }}</td>
+    <td>{{ sa.updated }}</td>
+    <td>{{ sa.severity }}</td>
+    <td>{{ sa.affected }}</td>
+    <td><a href="{{ sa.url }}">{{ sa.title }}</a></td>
+  </tr>
+{% endfor %}
+</tbody>
+</table>
