@@ -1,0 +1,44 @@
+Attendees:  Jeffrey Altman, Harald Barth, Derrick Brashear, Todd DeSantis,
+Jim Rees, Laura Stentz, Warren Yenson
+
+ Agenda
+
+* Updates on 1.4.1 release - 1.4.1. RC 9 will be put out tonight.  Need to
+check on a patch for Mac OS Tiger.
+
+*  Comments on release 1.5/1.6 plan from community - Jeff Altman sent the
+proposal for rollout of client side byte range locking out to the
+community.  The response to this proposal was that we should be more
+aggressive in getting this functionality into the product.  (This response
+was in contrast to the more conservative response  we got from the
+community the last time we sent out a proposal to implement locks.).  We
+will hold discussions on the newly created mailing list
+
+*  Discussion of standardization of new RPCs and RPC extensions.  -  From
+the standardization perspective, there are several implementations  - the
+OpenAFS implementation, ARLA implementation, IBM implementation, RedHat
+implementation.  The OpenAFS team would like to make sure that IBM, ARLA,
+RedHat can participate and implement the new functionality if they wants
+to.   Laura will let others in IBM know about the mailing lists associated
+with these plans.
+
+*  USENIX Funds
+
+* Status on transfer - CMU has agreed to accept the OpenAFS funds collected
+by USENIX.  Derrick will talk with Tom at CMU and have the USENIX  funds
+mailed to the CMU account which contains the excess OpenAFS workshop
+proceeds.
+
+*  AFS Workshop at UMich
+
+--  Date:  Week of June 19 or June 26.  Esther is working on rooms, costs,
+hotels to determine the optimal week.  Preference is week of June 19.   We
+need to also check on the Apple worldwide developers conference and make
+sure there isn't overlap before we finalize the date.  Apple may be able to
+work around our date if we notify them soon.  Elders' dinner may be
+scheduled for Wed or Thurs of the conference week.  It was noted that, in
+terms of location, the preference is at UMich campus (rather than at other
+Ann Arbor locations).  Jeff and Jim will review the list of possible
+locations.
+
+Next Meeting:  March 28 @ 1:00

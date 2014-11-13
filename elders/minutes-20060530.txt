@@ -1,0 +1,32 @@
+Attendees:  Jeff Altman, Harald Barth, Derrick Brashear, Todd DeSantis, Jim
+Rees, Jeff Schiller, Laura Stentz, Warren Yenson.
+
+Summary:
+
+*  Development Update - We have been working through a few issues on the
+UNIX and Windows operating systems, but all are fixed (or have
+workarounds).  1.5.2 is in progress.
+
+*  Equipment Update - We have had to return our Apple equipment.  However,
+Derrick/Sine Nomine have purchased equipment.  In addition, Morgan Stanley
+is planning to donate an Opteron (x86_64) machine to OpenAFS via CMU.
+Warren is working out the specifics with CMU.
+
+*  Workshop Update/Attendance - Jeff Altman, Derrick Brashear, Todd
+DeSantis (Tues-Friday AM), Jim Rees, Warren Yenson (Wednesday-Thursday) are
+the Elders who will be attending the Workshop.  On Wednesday evening, there
+is a  "Meet/Greet the Elders" event at dinner.    The Elders would also
+like to have a  Wednesday lunch meeting (for Elders only).  Another social
+event and opportunity to talk with OpenAFS users is Thursday evening drinks
+and appetizers at a local brew pub.
+
+*Elders - Change in Affiliation:  Warren Yenson is leaving Morgan Stanley
+at the end of this week, and he is moving to Google's Application Support
+and Systems Administration Group.  While Google does not use OpenAFS,
+Warren would like to remain on the Council of Elders at this time.  He will
+re-evaluate his position a few months into the job at Google.  If he is
+still able to contribute to the Elders, he'd like to remain on the Council.
+
+Next Meeting:
+
+Tuesday, June 27  1:00-1:30 Eastern

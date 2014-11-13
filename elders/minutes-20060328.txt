@@ -1,0 +1,39 @@
+Attendees:  Russ Allbery, Jeff Altman, Harald Barth, Derrick Brashear, Todd
+DeSantis, Jim Rees, Jeff Schiller, Laura Stentz.
+
+
+Agenda:
+
+*  Development Update - 1.4.1 RC10 - We were hoping RC10 would be the final
+release candidate;  however,  file server bugs were recently reported.
+These problems must be fixed prior to a final release. The MacOS installer
+with universal binaries - powerpc/intel is available.  We would like to
+have those with Macs try this release.
+
+*  RPC Standardization - Discussions are ongoing on the mailing list.
+Todd has looked at this from an IBM perspective, and he doesn't think that
+the impact would be significant.  It was mentioned that it may be
+worthwhile to explore whether or not we could get a funding effort started
+to submit this as a standard.  (But, even with funding, time and relative
+priorities are also issues).
+
+*  Windows Active Directory - There was a discussion on how we could
+develop more "how to" documentation on using Active Directory with OpenAFS
+for Windows.  There is documentation available, but not "step-by-step,
+how-to" documentation.   There was also a discussion on whether or not a
+viable wiki is available.  The use of Active Directory with OpenAFS is a
+topic which some feel would be good for the OpenAFS Workshop.
+
+*  OpenAFS Workshop - The OpenAFS Workshop has been scheduled for the week
+of June 12 at UMich.  We are soliciting suggestions for interesting keynote
+speakers.  (Please send a note to Derrick and/or Jeff if you have anyone in
+mind.)  A call for papers has been published.  The committee will be
+accepting papers through ~ April 25.  Those who have had papers accepted
+will be notified by May 1.  If Elders have topics that would be of
+interest, they are welcome to give talks and/or solicit experts that would
+be interested in giving talks via openafs-info.
+
+*  USENIX Funds - We expect the check to be sent to CMU shortly.  Derrick
+will notify the Elders when it arrives.
+
+*  Next Meeting - April 25 @ 1:00 Eastern Time (Daylight Savings Time)

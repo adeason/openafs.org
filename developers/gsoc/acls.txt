@@ -1,0 +1,180 @@
+Some additional notes on how to attack per-file ACLs task:
+
+** See Updates at End
+
+Last updated 03/28/2008 11:59 AM EST
+
+1. remote procedure calls -- AFS (and NFS, etc) have a generic mechanism
+for specifying remote procedure calls, and this is used to define the APIs
+presented in the system.  The RPC mechanism in AFS is called
+"rx"--files like "fs.xg" contain something very similar to C function
+prototypes and some constant definitions.  The rxgen program generates C
+program code including client and server stubs for the calls.  The file
+afsfileprocs.c is part of the implementation of the fs RPCs.  The file
+server has an API that has (IIRC) only one call related to ACLs, the
+FetchACL in fs.xg.  The AFS cache managers or other clients use the call
+to get ACL information--the file sever also uses ACL information to check
+when ACLs a file operation (other RPCs) would violate the ACL.
+
+2. on-disk format.  The portable file server in OpenAFS is called namei,
+and it defines a kind of binary file format in for storing information
+on file server machines, corresponding to files and directories,
+including file meta-data, such as ACLs.  The file server (and
+backup/dump mechanism) know how to read and write files and file
+metadata directly--clients just use the RPC apis to work with files, and
+occasionally list or change the ACLs on a file object.
+
+I'd say the theory you are interested in is pretty basic C programming
+and data structures, for most of the work.  You just have to get used to
+the idea that there is a superstructure of RPCs and services on top--but
+the low-level code is rather simple, most people find.  On the "back
+end" you will be extending (or maybe changing) the on-disk format for
+storing ACLs, and updating programs that parse the data--mostly just the
+file server, and some programs that do backups/dump data.  The dump
+mechanism is used to do data backups of AFS volumes, and also to send
+data to replicas.  There is probability a question of whether ACLs
+should be implemented in a new, ordinary Unix file, or perhaps using
+extended attributes.  The former would be more conservative.
+
+You want to be able to talk about how you would go about creating a new
+extended format for storing per-file ACLs.  You need to talk a bit about
+backward-compatibility.  Older clients need to use their old RPCs, but
+new clients could use new RPC functions (with new prototypes) which you
+would implement, which would publish the per-file ACLs.  On the server
+side, you would discuss what supported behavior will be for new programs
+reading old file data and dumps, and conversely, old programs seeing
+style data.
+
+In the list of docmentation that follows, it would probably be most
+helpful to read the fscm-ispec.pdf--it's 130 pages, but you might kind
+of skim to get a feel for what's covered.
+
+Some notes on getting spun up quickly on AFS code:
+
+Documentation
+
+The following offical docs are fairly short, and give overviews of how
+subsystems are developed--all of these are found in the OpenAFS source
+distribution, under /doc/:
+
+AFS Programmers Manual
+archov-doc.pdf
+
+File-Server/Cache Manager Interface
+fscm-ispec.pdf
+
+Volume Location Server Interface
+vvl-spec.pdf
+
+Rx Spec (Rx Programmers Manual with example code)
+rx-spec.pdf
+
+Tools
+
+It can be really helpful to have some tools (besides recursive grep in
+the source) to trace structures and calls through the AFS source code.
+
+You might find one of the following helpful:
+
+* source navigator (what I mostly use)
+~  http://sourcenav.berlios.de/
+* cscope
+* emacs/etags
+
+-- Matt Benjamin
+
+Update 03/28/2008 11:59 AM EST
+
+[Responds to comments on this page, and comments on submission for this task]
+
+Good questions...
+
+1. Right--the SRXAFS_FetchACL is the server implementation of the
+RPC--the rxgen utility lets you define a prefix for the client/server
+stubs and expected implementation name
+
+2. Above-mentioned libacl.c was mistyped.  In src/labacl/, meant
+aclprocs.c   :)
+
+3. The answer to this is that the namei fileserver stores the ACLs in an
+on-disk buffer corresponding to the vnode (the file).  From the file
+system of an AFS file server, you can inspect the files created by the
+namei fileserver.  First, AFS expects you to mount 1 or more
+dedicated partitions to store files in special mount points such as
+/vicepa (and /vicepb, /vicepc, ... /vicepaa...).  (In Openafs, the
+partitions need not be dedicated--you may put a file "AlwaysAttach" in a
+/vicep<x> directory.)  Then, under that directory, the file server
+creates some objects whenever a volume is created on that partition:
+
+(My understanding in what follows is generally reliable, but I haven't
+trawled this code too much.)
+
+a. an object to store the "volume header"--stores per-volume info,
+including links to all the vnodes in the volume
+
+b. a tree of objects storing information about files and
+directories--the "vnodes" under "AFSIDat" where the "I" is for "inode",
+the unix internal name for a file
+
+	b.1 the ACLs are serialized into vnode files
+
+The naming for the vnode files is "magical" and designed to be cheap to
+compute (and concise).
+
+I haven't worked through all the code that serializes/edits this data
+myself.  However, the code to do it is I think mostly in aclprocs.c.
+However, the volume package defines on-disk structures for vnodes as
+well as volume header, in src/vol/vnode.h.
+
+I think I may be pushing you deeper into the work of the project itself
+than is needed, but having some grasp of this level won't hurt.
+
+Another (and maybe the only other client) of the low-level
+code is the code used for running backups (dump/restore, and releasing
+replicas, in src/volser).  The code in volprocs.c and vol-dump.c seems
+particularly easy to read--you should be able to make out where it
+parses ACLs from dumps, and where it serializes ACLs when dumping a volume.
+
+The next level above this is the code in afsfileprocs.c, which is
+sending ACL data across the wire, and implementing the set acl command.
+(And enforcing ACLs when clients try to do file operations, too, of course.)
+
+One point worth noting, I believe, is that the RPC interface doesn't
+expose the on-disk format.  (Meaning, it can change without directly
+affecting the code for the clients, which is obviously convenient, and
+should make our job easier.)
+
+Further, I think the FetchACL and StoreACL RPCs are only performed by
+the cache manager when getting or setting ACLs from the command line (or
+admin tools).  If you grep -r for FetchACL in src/afs, you find it's
+only mentioned once, in afs_pioctl.c.  That file implements the "fs"
+commands--it's not part of the file handling code in the client.
+
+The RPCs do have a format for sending ACL data on the wire, defined by
+the FetchACL and StoreACL RPCs, and you probably will need to decide how
+you would either change those RPCs or (backward compat?) make new RPCs
+capable of carrying the new extended ACL info.
+
+The client does cache some info about whether different users have
+access to files about which it has information (in its vcache).
+However, it doesn't have the full ACL in there.  This probably means
+there won't be too much code to change in the cache manager itself to
+implement the extended ACLs.
+
+Finally, this discussion does bring us around to the (rather simple)
+code OpenAFS has to let users list and change ACLs from the command line
+(or other tools, but most of these are separately maintained from AFS,
+and you don't need to worry much about them--there's a libadmin you can
+also ignore for this project).  These are all options in the "fs"
+command.  The code for it is in src/venus/fs.c.  You find that the AFS
+commands mostly package up some options, and then make one of those
+"pioctl" calls I mentioned above.  This might lead you to think that
+you'll need to:
+
+a. change any code in fs.c that assumes ACLs can only be on files, etc,
+based on your design
+
+b. either change the existing PGetACL and PSetACL pioctls (those
+functions again) that implement the fs ACL commands--or maybe (backward
+compat?) add new ones that understand extended ACLs (and call whatever
+you defined for RPCs dealing with extended ACLs)

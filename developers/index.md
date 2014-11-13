@@ -64,8 +64,8 @@ See the [list of stars](credits.html) who bring you OpenAFS. (Your name could be
 
 ### Google Summer of Code ###
 
-Read about [GSoC ideas](XXXbrokenlink).
+Read about [GSoC ideas](/developers/gsoc/).
 
 ### Roadmap ###
 
-Check out the [feature wishlist](XXXbrokenlink).
+Check out the [feature wishlist](/roadmap/).

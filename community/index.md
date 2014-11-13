@@ -36,7 +36,7 @@ Read a summary of [what's happening in the OpenAFS community](/newsletter/).
 
 ### Success Stories ###
 
-Read about [experiences with AFS](XXXbrokenlink).
+Read about [experiences with AFS](/community/success.html).
 
 ### Follow Us ###
 

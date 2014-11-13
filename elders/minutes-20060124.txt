@@ -1,0 +1,57 @@
+Attendees:  Jeffrey Altman, Derrick Brashear, Todd DeSantis, Craig
+Everhart, Laura Stentz, Warren Yenson.
+
+Meeting Summary:
+
+* Updates on 1.4.1 release
+
+We are close to a release candidate.   The fifth release candidate will be
+available in source form tonight on all platforms.  Binaries will be built
+for Windows and MacOS.
+
+* Confirmation of proposed release plan for 1.5/1.6
+
+It was proposed that we release client-side byte range locking in 1.5 and
+1.6 releases according to Jeff Altman's proposal sent to the Elders on
+12/16/05.   The Elders have agreed with this plan with the announcement
+letter.  Jeff will send out the proposal to the community for comment.
+
+* Discussion of standardization of new RPCs and RPC extensions.  What
+process should OpenAFS follow?
+
+Jeff Altman has a collection of RPC extensions that he would like to have
+evaluated.   Todd will go back and look at those from IBM's view point.
+Jeff has proposed that we set up a standards mailing list to discuss
+protocol changes.  It was proposed that we post to both the existing
+standards mailing list and a new OpenAFS standards list.
+
+*  DNS Contact
+
+Laura agreed to be the new DNS contact.  Derrick will have this change
+made, and he will have correspondence sent to Laura's IBM address.
+
+*  USENIX Funds
+
+There is $1200 in the USENIX OpenAFS account which could possibly be added
+to the excess workshop funds held at CMU (Derrick will check).  The Elders
+agreed that we should try to put the $1200 into the CMU account first and
+then evaluate a formal proposal for spending the money.  (Other potential
+items:  workshop, etc.)
+
+* Approval of announcement letter regarding changes to the Elders (to be
+sent separately)
+
+Laura will send out a draft announcement letter on Elders/Gatekeeper
+changes for approval by the Elders.    Please approve within 24 hours of
+receipt so that we may move ahead with this announcement and with the
+client-side byte range locking announcement letter.
+
+* Meeting Notes
+
+Derrick suggested that meeting notes be sent out to the community.  He
+agreed to do this, and will send out edited minutes for comment or default
+acceptance.
+
+*  Next meeting:  February 28, 1:00 PM Eastern time
+
+

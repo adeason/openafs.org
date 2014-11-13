@@ -1,0 +1,187 @@
+GSoC project: OpenAFS ptserver support for multiple authentication namespaces
+
+Introduction
+
+For quite some time people have looked at using mechanisms other than the
+embedded Kerberos to do authentication with AFS. While some progress has
+been made moving towards Kerberos 5, the authentication names AFS continues
+to use for authorization are still tied to old, Kerberos 4-style names.
+
+In order that additional authentication types be supported as first class
+types in the AFS namespace, the AFS protection service will need to be
+updated to provide some additional operations.
+
+
+Goal
+
+The primary goal of this project is to define extensions to the protection
+server RPC interface to allow for arbitrarry mappings from the names used
+by various authentication mechanisms to AFS ID's, independent of the AFS
+usernames currently used for management of PRDB entries. The new interface
+provides mechanisms for adding, removing, and listing mappings, and to allow
+the fileserver to map an authentication name to a PTS identity.
+
+Additionally, there should be backward-compatible extensions to the PRDB
+database format to allow storage and lookup of these mappings. Since the
+mapping lookups required the addition of a hash table, a mechanism would be
+added to allow new hash tables to be added to the database in a
+backward-compatible way, at the expense of a 25% overhead in the size of
+each hash table. A smaller overhead would have been possible, but would
+probably be less efficient; our approach uses 40K to store a 32K hash table
+(8192 entries of 32 bits each).
+
+
+RPC Interface
+
+Four new RPC's are added, to allow adding, removing, and listing
+authentication names on an entry, and mapping an authentication name to an
+entry ID:
+
+#define AUTHDATAMAX 1024
+#define PRAUTHTYPE_KRB4 1
+#define PRAUTHTYPE_KRB5 2
+#define PRAUTHTYPE_GSS 3
+
+struct PrAuthName {
+afs_int32 kind;
+opaque data<AUTHDATMAX>;
+};
+
+typedef PrAuthName authnamelist<>;
+
+AddAuthName(IN afs_int32 id, IN PrAuthName *aname) = NNN;
+
+RemoveAuthName(IN PrAuthName *aname) = NNN;
+
+ListAuthNames(IN afs_int32 id, OUT authnamelist *alist) = NNN;
+
+AuthNameToID(IN authnamelist *alist, OUT idlist *ilist) = NNN;
+
+The AddAuthName and RemoveAuthName operations are always permitted for
+admins, and are normally also permitted for the owner of the entry to be
+updated (note that for RemoveAuthName, the entry being updated is always
+the one to which the specified name currently maps). In any case, any give
+authentication name can map only to one ID; attempting to add a second
+mapping fails.
+
+The ListAuthNames operation is permitted for admins and for the owner of the
+entry to be listed. If the 'S' (PRP_STATUS_ANY) bit is set on the entry, then
+other users may also perform this operation.
+
+The AuthNameToID operation is analogous to NameToID, and like that function
+may be used by anyone. There has been some argument that this operation
+should be restricted in the same fashion as ListAuthNames.
+
+
+Database Entry Format Extensions
+
+Authentication names are stored in separate prdb entries, with the following
+format:
+
+#define PRAUTHNAME 0x200  /* type bit for struct authentry */
+#define PRTYPE     0x33f  /* was 0x3f */
+
+#define ANSIZE 160
+
+struct authentry {
+afs_int32 flags;
+afs_int32 id; /* id of owning entry */
+afs_int32 cellid; /* unused */
+afs_int32 next; /* next block for this authname */
+afs_int32 nextHash; /* next authname in this bucket */
+afs_int32 nextAuthName; /* next authname for this entry */
+afs_int32 kind; /* PRAUTHTYPE_* */
+afs_int32 length; /* total length of auth data */
+unsigned char data[ANSIZE};
+};
+
+If the authoriation data is longer than 160 bytes, then additional entries
+of the same type are allocated, each holding 160 bytes of data. These
+are chained together using the 'next' field. The nextHash, nextAuthName,
+kind, and length fields are meaningful only in the first entry for any
+given authname.
+
+The reserved0 field from struct prentry is renamed authnames, and points
+at the first authname for that entry. Additional entries are chained via
+the nextAuthName field.
+
+Authenticaton name entries may be looked up by name in a new hash table
+established for that purpose (see below). When multiple entries hash to
+the same bucket, they are chained via the nextHash field.
+
+
+Database Hash Table Extensions
+
+In order to index authentication names, a new hash table was needed.
+The existing hash tables are 32K data structures appearing as part of the
+database header, which is a fixed-size structure located before the first
+entry in the database. There is no room to add another hash table here,
+so a backward-compatible way to add additional hash tables (or other large
+data structures) to the database needs to be provided. Another new entry
+type can be used, with the following format:
+
+#define PRHASHTBL 0x100
+#define PRTABLE_AUTHNAME 1
+
+struct hashentry {
+afs_int32 flags;
+afs_int32 id; /* unused */
+afs_int32 cellid; /* unused */
+afs_int32 next; /* next entry this table */
+afs_int32 nextTable; /* next table */
+afs_int32 tableid; /* table type */
+afs_int32 offset; /* first bucket # in this entry */
+afs_int32 reserved;
+afs_int32 buckets[32];
+};
+
+Each hash table is represented as a set of hashentry structures, as many
+as are needed, appearing consecutively in the database and chained together
+via the next pointer (primarily to avoid confusing debugging tools). There
+is room for 32 bucket pointers in each entry, which means an 8192-entry
+table requires 256 entries.
+
+In each entry, the tableid field contains an integer indicating the type of
+table this entry belongs to (this is the same for all entries making up a
+table), and the offset field indicates the number of the first bucket
+contained in this entry. Multiple entries belonging to the same table
+must be consecutive.
+
+The extension allows for multiple tables, which are chained together in a
+linked list via the nextTable field. The head of the list is stored in the
+reserved4 field of the prheader, which is renamed to ext_hashtables. When
+searching for a particular table, the server need only walk this chain
+until it finds the first entry for the table it is looking for, the
+remaining entries for that table will immediately follow the first one
+in the database (and will *not* be in the nextTable chain). It is
+expected that the server will perform this search once at startup and
+cache the results; to enable this, the location of a table must not
+change once it has been created.
+
+The database table type 1 is assigned for the authentication name hash table.
+
+
+Authentication Name Types
+
+1 - Kerberos V4
+
+The format of the Kerberos V4 name type is either name@REALM or
+name.inst@REALM, depending on whether a non-null instance is present. In
+both cases the trailing NUL character is *not* part of the authentication
+name data.
+
+2 - Kerberos V5
+
+The format of the Kerberos V5 name type is a Kerberos principal and realm
+name, encoded in the conventional format. That is, it is the concatenation
+of all principal name components in order, separated by slash (/) characters,
+followed by an at-sign (@) and the realm name. Any occurrances of the slash
+or at-sign in a principal name are escaped by a backslash (), as is the
+backslash itself. These characters are _not_ escaped in the realm name.
+In any case the trailing NUL character is *not* part of the authentication
+name data.
+
+
+3 - GSSAPI Export Names
+
+The format of the GSSAPI name type is that described in section 3.2 of RFC2743.

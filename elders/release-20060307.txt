@@ -1,0 +1,8 @@
+The OpenAFS Council of Elders is pleased to announce that Harald Barth
+(KTh, Kungliga Tekniska hvgskolan [Royal Institute of Technology] Stockholm
+Sweden) has accepted an invitation to join the Council.  Harald's name will
+be familiar to those who have followed OpenAFS development since the
+formation of OpenAFS.  He is an active supporter of both OpenAFS and Arla.
+Harald joins the other members of the OpenAFS Council of Elders:  Russ
+Alberry, Jeffrey Altman, Derrick Brashear, Todd DeSantis, Jim Rees, Jeffrey
+Schiller, Laura Stentz, and Warren Yenson.  Welcome, Harald!

@@ -1,0 +1,108 @@
+Meeting of September 1, 2009
+Attending: Jeff, Derrick, Ali, Laura, Tom, Russ
+
+Notes:
+Software Freedom Conservancy
+
+Letter to the community about the foundation resulted in no
+public discussion or commentary whatsover. We've done our due diligence
+and thus can approach the Software Freedom Conservancy about moving forward
+
+The primary possible concern with the SFC is the trademark
+issue.  They may tell us it's not an issue, they may help us resolve it,
+or they may say that we should go ahead with a name change to avoid the
+trademark.
+
+By unanimous vote of those present, motion to send the letter to
+the SFC passed.
+
+Current topics
+
+Large numbers of people already shipping Windows 7 due to the
+staggered release.  The existing clients will work on Windows 7, except
+that the client cannot run binaries out of AFS due to new security
+measures that Windows put into place around SMB. This will be a serious
+problem for many organizations.
+
+The solution is the redirector, and we're far along in having
+that reimplemented.  Testing last week at Microsoft.  There are some
+bugs that need to be sorted out, but the interop with third-party device
+drivers went very smoothly.
+
+There are some remaining hard user interface questions, since the
+existing credential manager and control panel tools are not compatible
+with Windows 7 and will need to either be removed or replaced.
+
+Day zero support for Snow Leopard including 32 and 64 bit, userspace and
+kernel. Have 1.4 for Snow Leopard, will release a new full 1.4 release
+sometime this year regardless of what happens with 1.5.  However, the
+goal is to release 1.6 this year. 1.5 testing ongoing by several Elders
+as well as in the community.
+
+All Debian source patches have been pushed to Gerrit, so we are very close
+to having Debian build from upstream.
+
+Not a lot of progress on documentation, but there are some
+patches from Jason Edgecombe being merged.
+We've made progress on moving the website into Git, but completion is
+waiting for Jeff Hutzelman to have time to cut
+over the production site. Derrick will provide a bridge in the meantime to
+cut over.
+
+Google Summer of Code
+Concluded for the year. For Linux kAFS, code for pioctl support for
+kafs with file attributes and possibly a standard /proc interface for
+global requests is ready for merging into the kernel.  Assuming that's
+accepted to the kernel, OpenAFS should evaluate whether we can use the
+same interface. That would allow kafs to use the OpenAFS userland tools.
+
+Management console for Windows made the most progress of any project.
+Brent has a working framework and installation and removal and
+some of the functionality.  It will need to be completed outside of SoC,
+but the basics are there.
+
+Jake was working on the server preference algorithm in the client
+with something more intelligent and not based on classful networks.  The
+new algorithm is based on exported performance characteristics from rx
+combined with statistics from fetchdata and storedata and dynamically
+adjusts priorities every five minutes. Code is not ready for integration into
+a release at this point, but is available as a standalone package in the
+short term.  It will need to wait until there are improvements in the
+rx library for calculation of the timeout value.  Currently, the library
+doesn't include enough events and includes events that will result in
+miscalculation and a much higher timeout value than is appropriate.
+
+Jake's work so far not available for Unix, but we're not worried
+about that.  He may finish, or Derrick can lift it from the Windows client.
+
+
+Two events in September.  Hackathon at Edinburgh organized by Simon
+with ten developers attending, which is quite good for a hackathon and
+the travel required.  The focus will be on wire protocol changes.  Over
+the next few weeks there will be a proposal sent to the standardization
+list for the rxk5 security class. A document for rxgk should also be
+published in roughly the same time frame.
+That makes for a busy agenda and everything probably won't get
+done, but hopefully there will be a lot of progress.
+
+In the following week is the European AFS conference in Rome.
+Derrick and Jeff will be going to both events, and on October 1st
+will be meeting with representatives of CASPUR and CERN who are
+interested in discussing organization of development resources for
+OpenAFS in Europe.
+
+Current balance in the Elders fund at CMU:
+Without the Secure Endpoints invoice for the 2009 Workshop, $37,637.
+After, $19,539.
+April 1st, $31,931.  There were another $9,500 receipts after that.
+We would have then lost a percent of that from credit card fees.
+However, that's more than 2%, so Tom will investigate whether
+something was charged incorrectly against the account.
+
+Concluding items:
+
+Jeff will let us know what he hears back from the SFC.  One to
+six months is normal, although for us it will probably be on the shorter
+side.
+
+Meeting concludes.

@@ -1,0 +1,46 @@
+Attendees:  Jeffrey Altman, Derrick Brashear, Todd DeSantis, Laura Stentz,
+Warren Yenson.
+
+Software Freedom Conservancy - One of our contributors has made us aware of
+a new organization called the Software Freedom Conservancy (SFC).  This is
+an organization which was founded in March 2006 by lawyers to promote open
+source software development.  The SFC has filed to become a 501c3
+organization, and they should attain this status in March 2007.  The SFC
+currently has 6 small open source software projects.  The SFC promotes the
+software commons license, and it requires that the SFC would own all new IP
+if a project joins the Conservancy.  The primary advantages of joining the
+SFC are:    insurance coverage to protect individuals/contributors involved
+in an open source project, availability of a bank account, and 501c3 status
+for accepting tax-free contributions.  The SFC is an organization that we
+can follow and determine if they could add any value beyond what we can
+achieve independently or via our current relationships with CMU and USENIX.
+
+Development 1.4.1 - OpenAFS 1.4.1 was released earlier this month.  There
+have been no major problems, but some minor fixes are still being
+incorporated.   Derrick mentioned that it would be helpful to have an
+Intel-based Mac machine for developing new releases.  Warren will see if
+there is a machine available for donation at Morgan Stanley.  If not, we
+may be able to purchase a machine if funds are available after the OpenAFS
+Workshop.  We'll also need to purchase hardware to host our servers and
+mail.
+
+Development 1.5.1 - A release is coming soon--possibly this
+evening--(except for MacOS).  1.5 does have byte range locking, but it does
+not have mandatory locking on the file servers.  Jeff A. will restart the
+discussions on standardization bboard on the locking topic to gain input
+for future releases.
+
+OpenAFS Workshop - The OpenAFS Workshop will be held June 12-16 at UMich.
+The format of the Workshop is the same as last year:  AFS Tutorial on
+Monday, Kerberos Tutorial on Tuesday, Presentations on  Wed-Fri (noon).
+The call for papers closed on Friday, April 21.  We have more submissions
+than times available.  (This represents an increase in submissions over
+last year).  The committee will decide on which talks to accept by this
+Friday (April 28).  If there is a topic that the Elders want to present or
+if we'd like to hold a panel on Friday (June 16) to gather input on where
+the community wants OpenAFS to go, we should decide that by April
+28---prior to the talks being accepted.  Jeff A. will talk with a potential
+keynote speaker to determine interest/availability.  If others would like
+to recommend keynote speakers, please do so ASAP.
+
+Next Meeting - Tuesday, May 30 - 1:00 Eastern Time
